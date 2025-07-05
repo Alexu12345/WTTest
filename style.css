@@ -664,7 +664,7 @@ button.disabled {
 
 #newTimingsContainer {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     gap: 10px; /* Space between timing inputs */
     width: 100%;
 }
