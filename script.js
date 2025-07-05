@@ -2111,7 +2111,7 @@ const renderEmployeeRatesAndTotals = async () => {
                     const actionsCell = row.insertCell();
                     const modifyBtn = document.createElement('button');
                     modifyBtn.textContent = getTranslatedText('modify'); 
-                    modifyBtn.classList.add('admin-action-btntp', 'primary');
+                    modifyBtn.classList.add('admin-action-btn', 'primary');
                     modifyBtn.addEventListener('click', () => openEditEmployeeRateModal(user.id, user.name, account.id, account.name, defaultPrice, customPrice, customRateDocId));
                     actionsCell.appendChild(modifyBtn);
 
