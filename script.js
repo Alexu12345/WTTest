@@ -1,5 +1,5 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore, doc, collection, getDocs, setDoc, updateDoc, deleteDoc, query, where, orderBy, limit, Timestamp, serverTimestamp, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"; // Updated Firebase SDK version
+import { getFirestore, doc, collection, getDocs, setDoc, updateDoc, deleteDoc, query, where, orderBy, limit, Timestamp, serverTimestamp, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; // Updated Firebase SDK version
 
 // Your web app's Firebase configuration
 // This must be consistent with the one you use for your Firebase project.
@@ -801,8 +801,13 @@ const handleLogin = async () => {
     }
 };
 
-// Login button is removed, so no event listener for it.
-// PIN input logic is handled in DOMContentLoaded.
+// Logout function (defined globally for accessibility)
+const logout = () => {
+    clearSession();
+    showPage(loginPage);
+    pinInputs.forEach(input => input.value = ''); // Clear all PIN inputs
+    pinInputs[0].focus(); // Focus on first PIN input
+};
 
 // 6. Main Dashboard Logic (Updated for dynamic balance calculation)
 const renderMainDashboard = async () => {
@@ -863,34 +868,21 @@ const renderMainDashboard = async () => {
     }
 };
 
-startWorkOptionBtn.addEventListener('click', async () => {
+// Moved event listener logic into named functions for clarity and proper binding
+const handleStartWorkOptionClick = async () => {
     if (loggedInUser && loggedInUser.id !== 'admin') {
         showPage(startWorkPage);
         await initializeStartWorkPage();
         updateSaveButtonState(); // Initial state for save button
     }
-});
+};
 
-trackWorkOptionBtn.addEventListener('click', async () => {
+const handleTrackWorkOptionClick = async () => {
     if (loggedInUser && loggedInUser.id !== 'admin') {
         showPage(trackWorkPage);
         await renderTrackWorkPage(); // This will now also render the chart
     }
-});
-
-// Logout Buttons
-logoutDashboardBtn.addEventListener('click', () => {
-    clearSession();
-    showPage(loginPage);
-    pinInputs.forEach(input => input.value = ''); // Clear all PIN inputs
-    pinInputs[0].focus(); // Focus on first PIN input
-});
-logoutAdminBtn.addEventListener('click', () => {
-    clearSession();
-    showPage(loginPage);
-    pinInputs.forEach(input => input.value = ''); // Clear all PIN inputs
-    pinInputs[0].focus(); // Focus on first PIN input
-});
+};
 
 // 7. Start Work Page Logic
 const fetchAccountsAndTasks = async () => {
@@ -934,7 +926,7 @@ const initializeStartWorkPage = async () => {
     await fetchAccountsAndTasks(); // This now uses cached data
 };
 
-confirmSelectionBtn.addEventListener('click', () => {
+const handleConfirmSelection = () => {
     const accountId = accountSelect.value;
     const taskDefinitionId = taskTypeSelect.value;
 
@@ -954,7 +946,7 @@ confirmSelectionBtn.addEventListener('click', () => {
     } else {
         showToastMessage(getTranslatedText('errorLoadingData'), 'error'); // Changed alert to toast
     }
-});
+};
 
 // Event listener for the new "Back" button in the task selection popup
 backToDashboardFromPopup.addEventListener('click', () => {
@@ -1073,7 +1065,7 @@ const updateSaveButtonState = () => {
     }
 };
 
-saveWorkBtn.addEventListener('click', async () => {
+const saveWorkRecord = async () => { // Renamed for clarity
     if (currentSessionTasks.length === 0) {
         showToastMessage(getTranslatedText('noTasksToSave'), 'error'); // Changed alert to toast
         return;
@@ -1115,7 +1107,7 @@ saveWorkBtn.addEventListener('click', async () => {
     } finally {
         showLoadingIndicator(false);
     }
-});
+};
 
 // Back button from Start Work Page
 backToDashboardFromStartWork.addEventListener('click', () => {
@@ -1250,6 +1242,9 @@ const renderTrackWorkPage = async () => {
                 accountData.totalRows = 0;
                 for (const taskRecordKey in accountData.tasks) {
                     const taskData = accountData.tasks[taskRecordKey];
+                    // Each timing within a task record gets its own row. If no timings, still one row for the task.
+                    const timingsCount = Object.keys(taskData.timings).length;
+                    taskData.totalRows = timingsCount > 0 ? timingsCount : 1;
                     accountData.totalRows += taskData.totalRows;
                 }
                 dateData.totalRows += accountData.totalRows;
@@ -1502,11 +1497,7 @@ const renderTrackWorkPage = async () => {
     }
 };
 
-backToDashboardFromTrackBtn.addEventListener('click', () => {
-    showPage(mainDashboard);
-});
-
-// 9. Admin Panel Logic
+// Admin Panel Logic
 const renderAdminPanel = async () => {
     if (!loggedInUser || loggedInUser.id !== 'admin') {
         showPage(loginPage);
@@ -1585,7 +1576,7 @@ const loadAndDisplayUsers = async () => {
     }
 };
 
-addUserBtn.addEventListener('click', async () => {
+const addUser = async () => { // Renamed for clarity
     const name = newUserNameInput.value.trim();
     const pin = newUserPINInput.value.trim();
 
@@ -1618,7 +1609,7 @@ addUserBtn.addEventListener('click', async () => {
     } finally {
         showLoadingIndicator(false);
     }
-});
+};
 
 // Admin: Manage Accounts (Updated for defaultPricePerHour)
 const loadAndDisplayAccounts = async () => {
@@ -1662,13 +1653,14 @@ const loadAndDisplayAccounts = async () => {
                 actionCell.appendChild(deleteBtn);
             });
         }
-    } catch (error) {
+    }
+    catch (error) {
         console.error("Error loading accounts:", error);
         showToastMessage(getTranslatedText('errorLoadingData'), 'error');
     }
 };
 
-addAccountBtn.addEventListener('click', async () => {
+const addAccount = async () => { // Renamed for clarity
     const name = newAccountNameInput.value.trim();
     const defaultPrice = parseFloat(newAccountPriceInput.value); // Get default price
 
@@ -1700,7 +1692,7 @@ addAccountBtn.addEventListener('click', async () => {
     } finally {
         showLoadingIndicator(false);
     }
-});
+};
 
 // Admin: Manage Task Definitions (Updated for minutes and seconds input)
 const loadAndDisplayTaskDefinitions = async () => {
@@ -1758,7 +1750,7 @@ const loadAndDisplayTaskDefinitions = async () => {
     }
 };
 
-addTimingFieldBtn.addEventListener('click', () => {
+const addTimingField = () => { // Renamed for clarity
     const minutesInput = document.createElement('input');
     minutesInput.type = 'number';
     minutesInput.classList.add('new-task-timing-minutes');
@@ -1778,9 +1770,9 @@ addTimingFieldBtn.addEventListener('click', () => {
     timingGroupDiv.appendChild(secondsInput);
 
     newTimingsContainer.appendChild(timingGroupDiv);
-});
+};
 
-addTaskDefinitionBtn.addEventListener('click', async () => {
+const addTaskDefinition = async () => { // Renamed for clarity
     const name = newTaskNameInput.value.trim();
     if (!name) {
         showToastMessage(getTranslatedText('fillAllFields'), 'error'); // Changed alert to toast
@@ -1840,7 +1832,7 @@ addTaskDefinitionBtn.addEventListener('click', async () => {
     } finally {
         showLoadingIndicator(false);
     }
-});
+};
 
 // Admin: Manage Work Records
 const populateUserFilter = async () => {
@@ -1939,17 +1931,6 @@ const loadAndDisplayWorkRecords = async (userId = null, date = null) => {
     }
 };
 
-filterRecordsBtn.addEventListener('click', async () => {
-    const selectedUserId = recordFilterUser.value === "" ? null : recordFilterUser.value;
-    const selectedDate = recordFilterDate.value === "" ? null : recordFilterDate.value;
-    showLoadingIndicator(true); // Show loading for filter action
-    try {
-        await loadAndDisplayWorkRecords(selectedUserId, selectedDate);
-    } finally {
-        showLoadingIndicator(false); // Hide loading after filter
-    }
-});
-
 // Edit Record Modal Functions
 const openEditRecordModal = (record) => {
     currentEditingRecordId = record.id;
@@ -1990,19 +1971,7 @@ const openEditRecordModal = (record) => {
     editRecordModal.style.display = 'flex'; // Use flex to center
 };
 
-closeEditRecordModalBtn.addEventListener('click', () => {
-    editRecordModal.style.display = 'none';
-    currentEditingRecordId = null;
-});
-
-window.addEventListener('click', (event) => {
-    if (event.target === editRecordModal) {
-        editRecordModal.style.display = 'none';
-        currentEditingRecordId = null;
-    }
-});
-
-saveEditedRecordBtn.addEventListener('click', async () => {
+const saveEditedRecord = async () => { // Renamed for clarity
     if (!currentEditingRecordId) return;
 
     const newAccountId = editAccountSelect.value;
@@ -2048,7 +2017,7 @@ saveEditedRecordBtn.addEventListener('click', async () => {
     } finally {
         showLoadingIndicator(false);
     }
-});
+};
 
 // --- New Admin Section: Employee Rates and Totals ---
 
@@ -2101,23 +2070,23 @@ const renderEmployeeRatesAndTotals = async () => {
 
             const userData = employeeWorkData.get(user.id) || { totalHours: 0, totalBalance: 0, workedAccounts: new Map() };
 
-            // Get accounts the user has worked on, or all accounts if they haven't worked on any
+            // Get accounts the user has worked on
             const userWorkedAccountIds = Array.from(userData.workedAccounts.keys());
-            const accountsToDisplay = userWorkedAccountIds.length > 0 
-                ? userWorkedAccountIds.map(id => accountsMap.get(id)).filter(Boolean) // Get actual account objects
-                : accounts; // If user hasn't worked, show all accounts with default rates
+            const accountsWorkedOn = userWorkedAccountIds.map(id => accountsMap.get(id)).filter(Boolean);
 
-            if (accountsToDisplay.length === 0) {
-                // If no accounts exist at all, or no accounts worked on and no accounts defined
+            if (accountsWorkedOn.length === 0) {
+                // If user hasn't worked on any account, display a single row for the user with "No data"
                 const row = employeeRatesTableBody.insertRow();
                 row.insertCell().textContent = user.name;
-                row.insertCell().colSpan = 4; // Span across account, default price, custom price, actions
-                row.insertCell().textContent = getTranslatedText('noDataToShow'); 
-                row.insertCell().textContent = userData.totalHours.toFixed(2);
-                row.insertCell().textContent = `${userData.totalBalance.toFixed(2)} ${getTranslatedText('currencyUnit')}`;
+                row.insertCell().textContent = getTranslatedText('noDataToShow'); // Account Name
+                row.insertCell().textContent = getTranslatedText('notSet'); // Default Price
+                row.insertCell().textContent = getTranslatedText('notSet'); // Custom Price
+                row.insertCell().textContent = ''; // Actions cell (empty)
+                row.insertCell().textContent = userData.totalHours.toFixed(2); // Total Hours
+                row.insertCell().textContent = `${userData.totalBalance.toFixed(2)} ${getTranslatedText('currencyUnit')}`; // Total Balance
             } else {
                 let isFirstRowForUser = true;
-                accountsToDisplay.forEach(account => {
+                accountsWorkedOn.forEach(account => {
                     let defaultPrice = account.defaultPricePerHour || 0;
                     let customRateData = customRatesMap.get(user.id)?.get(account.id);
                     let customPrice = customRateData?.customPricePerHour || null;
@@ -2129,10 +2098,8 @@ const renderEmployeeRatesAndTotals = async () => {
                     if (isFirstRowForUser) {
                         const cell = row.insertCell();
                         cell.textContent = user.name;
-                        cell.rowSpan = accountsToDisplay.length; // Span for all accounts this user worked on
+                        cell.rowSpan = accountsWorkedOn.length; // Span for all accounts this user worked on
                         isFirstRowForUser = false;
-                    } else {
-                        row.insertCell(); // Empty cell for subsequent rows of the same user
                     }
 
                     row.insertCell().textContent = account.name;
@@ -2149,15 +2116,14 @@ const renderEmployeeRatesAndTotals = async () => {
                     actionsCell.appendChild(modifyBtn);
 
                     // Total Hours and Total Balance (only for the first row of each user)
-                    if (isFirstRowForUser === false && accountsToDisplay.indexOf(account) === 0) { // This condition ensures it's the first row of the first account displayed for the user
-                        row.insertCell().textContent = userData.totalHours.toFixed(2);
-                        row.insertCell().textContent = `${userData.totalBalance.toFixed(2)} ${getTranslatedText('currencyUnit')}`;
-                    } else if (accountsToDisplay.length === 1) { // If only one account, display totals here
-                        row.insertCell().textContent = userData.totalHours.toFixed(2);
-                        row.insertCell().textContent = `${userData.totalBalance.toFixed(2)} ${getTranslatedText('currencyUnit')}`;
-                    } else {
-                        row.insertCell(); // Empty cell for subsequent rows
-                        row.insertCell(); // Empty cell for subsequent rows
+                    if (accountsWorkedOn.indexOf(account) === 0) { // This condition ensures it's the first row of the first account displayed for the user
+                        const totalHoursCell = row.insertCell();
+                        totalHoursCell.textContent = userData.totalHours.toFixed(2);
+                        totalHoursCell.rowSpan = accountsWorkedOn.length;
+
+                        const totalBalanceCell = row.insertCell();
+                        totalBalanceCell.textContent = `${userData.totalBalance.toFixed(2)} ${getTranslatedText('currencyUnit')}`;
+                        totalBalanceCell.rowSpan = accountsWorkedOn.length;
                     }
                 });
             }
@@ -2182,7 +2148,7 @@ const openEditEmployeeRateModal = (userId, userName, accountId, accountName, def
     editEmployeeRateModal.style.display = 'flex';
 };
 
-const saveCustomRate = async () => {
+const saveCustomRate = async () => { // Renamed for clarity
     showLoadingIndicator(true);
     try {
         const customPrice = parseFloat(modalCustomPriceInput.value);
@@ -2294,23 +2260,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Main Dashboard Buttons
     logoutDashboardBtn.addEventListener('click', logout);
-    startWorkOptionBtn.addEventListener('click', async () => {
-        if (loggedInUser && loggedInUser.id !== 'admin') {
-            showPage(startWorkPage);
-            await initializeStartWorkPage();
-            updateSaveButtonState();
-        }
-    });
-    trackWorkOptionBtn.addEventListener('click', async () => {
-        if (loggedInUser && loggedInUser.id !== 'admin') {
-            showPage(trackWorkPage);
-            await renderTrackWorkPage();
-        }
-    });
+    startWorkOptionBtn.addEventListener('click', handleStartWorkOptionClick); // Use named function
+    trackWorkOptionBtn.addEventListener('click', handleTrackWorkOptionClick); // Use named function
 
     // Add Admin Panel button dynamically if not already present
-    // This is a temporary way to add the button if it's not in HTML
-    // You might want to add this button directly in index.html and control its visibility with CSS/JS
     let adminPanelButton = document.getElementById('adminPanelOption');
     if (!adminPanelButton) {
         adminPanelButton = document.createElement('button');
