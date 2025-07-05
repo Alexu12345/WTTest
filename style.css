@@ -601,21 +601,21 @@ button.disabled {
 }
 
 .admin-section button {
-    background-color: #28a745;
+    background-color: #e0a800;
     color: white;
-    padding: 10px 20px;
+/*     padding: 10px 20px; */
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 10px;
     transition: background-color 0.3s ease;
-    margin-bottom: 0; /* Reset margin-bottom for buttons in flex container */
-    width: auto; /* Allow buttons to size based on content */
-    align-self: flex-start; /* Align buttons to the right in RTL */
+    margin-bottom: 0;
+    width: max-content;
+    align-self: flex-start;
 }
 
 .admin-section button:hover {
-    background-color: #218838;
+    background-color: #c82333;
 }
 
 #addTimingFieldBtn {
