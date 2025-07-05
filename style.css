@@ -21,17 +21,16 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for dark mode */
 }
 .admin-action-btntp{
-    background-color: #e0a800;
-    color: white;
-/*     padding: 10px 20px; */
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 10px;
-    transition: background-color 0.3s ease;
-    margin-bottom: 0;
-    width: max-content;
-    align-self: flex-start;
+    background-color: #e0a800 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 5px !important;
+    cursor: pointer !important;
+    font-size: 10px !important;
+    transition: background-color 0.3s ease !important;
+    margin-bottom: 0 !important;
+    width: max-content !important;
+    align-self: flex-start !important;
 }
 /* Page Containers - General styling */
 .page {
