@@ -415,7 +415,8 @@ const translations = {
         'close': 'إغلاق', // New translation for modal button
         'accountTotalTimeColumnShort': 'وقت الحساب', // New shorter translation for the column
         'accountBalanceColumn': 'رصيد الحساب', // New
-        'timeSinceLastClick': 'آخر نقرة منذ {minutes} دقيقة و {seconds} ثانية.' // New
+        'timeSinceLastClick': 'آخر نقرة منذ {minutes} دقيقة و {seconds} ثانية.', // New
+        'tasksSummaryTooltip': '{count} مهمات بـ {time} دقائق' // New
     },
     'en': {
         'loginTitle': 'Login',
@@ -559,7 +560,8 @@ const translations = {
         'close': 'Close', // New translation for modal button
         'accountTotalTimeColumnShort': 'Account Time', // New shorter translation for the column
         'accountBalanceColumn': 'Account Balance', // New
-        'timeSinceLastClick': 'Last click was {minutes} minutes and {seconds} seconds ago.' // New
+        'timeSinceLastClick': 'Last click was {minutes} minutes and {seconds} seconds ago.', // New
+        'tasksSummaryTooltip': '{count} tasks of {time} minutes' // New
     }
 };
 
@@ -1421,7 +1423,7 @@ const renderTrackWorkPage = async () => {
                         if (!dateRowSpanHandled) {
                             const cell = row.insertCell();
                             // Ensure date is formatted without time and stays on one line
-                            cell.textContent = new Date(dateKey).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+                            cell.textContent = new Date(dateKey).toLocaleDateString(currentLanguage, { day: 'numeric', month: 'short' }); // Format as "1 May"
                             cell.rowSpan = dateData.totalRows;
                             cell.classList.add('total-cell', 'date-cell'); // Add date-cell class
                         }
@@ -1450,23 +1452,30 @@ const renderTrackWorkPage = async () => {
                             timingValueCell.textContent = '00:00';
                         }
 
-                        // Column 6: Completed Tasks (per timing)
-                        const completedTasksCell = row.insertCell();
-                        if (currentTiming) {
-                            completedTasksCell.textContent = formatNumberToEnglish(currentTiming.count);
-                        } else {
-                            completedTasksCell.textContent = formatNumberToEnglish(0);
-                        }
+                        // Column 6: Completed Tasks (per timing) - REMOVED
 
-                        // Column 7: Total Time (per timing)
-                        const totalTimeCell = row.insertCell();
+                        // Column 7: Total Time (per timing) - Now column 6
+                        const totalTimeCell = row.insertCell(); // This is the cell next to the removed "Completed Tasks"
                         if (currentTiming) {
                             totalTimeCell.textContent = formatNumberToEnglish(formatMinutesToMMSS(currentTiming.totalTime));
                         } else {
                             totalTimeCell.textContent = formatNumberToEnglish('00:00');
                         }
+                        
+                        // Add tooltip for tasks summary to the totalTimeCell
+                        const taskSummaryTooltip = Object.keys(taskData.timings)
+                            .map(timing => {
+                                const summary = taskData.timings[timing];
+                                return getTranslatedText('tasksSummaryTooltip', {
+                                    count: formatNumberToEnglish(summary.count),
+                                    time: formatNumberToEnglish(formatMinutesToMMSS(parseFloat(timing)))
+                                });
+                            })
+                            .join('\n'); // Join with newline for multi-line tooltip
+                        totalTimeCell.title = taskSummaryTooltip;
 
-                        // Column 8: Total for Task (per task record)
+
+                        // Column 8: Total for Task (per task record) - Now column 7
                         if (!taskRowSpanHandled) {
                             const cell = row.insertCell();
                             cell.textContent = `${formatNumberToEnglish(formatMinutesToMMSS(taskData.taskTotalTime))} (${formatNumberToEnglish(taskData.taskTotalBalance.toFixed(2))} ${getTranslatedText('currencyUnit')})`;
@@ -1474,7 +1483,7 @@ const renderTrackWorkPage = async () => {
                             cell.classList.add('total-cell');
                         }
 
-                        // Column 9: Total for Account (per account)
+                        // Column 9: Total for Account (per account) - Now column 8
                         if (!accountRowSpanHandled) {
                             const cell = row.insertCell();
                             cell.textContent = `${formatNumberToEnglish(formatMinutesToMMSS(accountData.accountTotalTime))} (${formatNumberToEnglish(accountData.accountTotalBalance.toFixed(2))} ${getTranslatedText('currencyUnit')})`;
@@ -1482,7 +1491,7 @@ const renderTrackWorkPage = async () => {
                             cell.classList.add('total-cell');
                         }
 
-                        // Column 10: Daily Total Time (per date) - New column
+                        // Column 10: Daily Total Time (per date) - Now column 9
                         if (!dateRowSpanHandled) {
                             const cell = row.insertCell();
                             cell.textContent = `${formatNumberToEnglish(formatMinutesToMMSS(dateData.dateTotalTime))} (${formatNumberToEnglish(dateData.dateTotalBalance.toFixed(2))} ${getTranslatedText('currencyUnit')})`; // Display daily total
@@ -1510,25 +1519,25 @@ const renderTrackWorkPage = async () => {
         
         // Grand Total label
         let cell = footerRow.insertCell();
-        cell.colSpan = 4; 
+        cell.colSpan = 4; // Adjusted colspan
         cell.textContent = getTranslatedText('grandTotal');
         cell.classList.add('grand-total-label');
 
-        // Total Tasks Overall value
-        cell = footerRow.insertCell();
-        cell.colSpan = 2; // Span across Timing Value, Completed Tasks
-        cell.textContent = `${getTranslatedText('totalTasksOverall')}: ${formatNumberToEnglish(grandTotalTasks)}`;
-        cell.classList.add('grand-total-value');
+        // Total Tasks Overall value - REMOVED
+        // cell = footerRow.insertCell();
+        // cell.colSpan = 2; // Span across Timing Value, Completed Tasks
+        // cell.textContent = `${getTranslatedText('totalTasksOverall')}: ${formatNumberToEnglish(grandTotalTasks)}`;
+        // cell.classList.add('grand-total-value');
 
-        // Total Time Overall value
+        // Total Time Overall value - Now column 5 (colSpan 2)
         cell = footerRow.insertCell();
         cell.colSpan = 2; // Span across Total Time, Total for Task
         cell.textContent = `${getTranslatedText('totalTimeOverall')}: ${formatNumberToEnglish(formatTotalMinutesToHHMMSS(grandTotalTime))}`;
         cell.classList.add('grand-total-value');
 
-        // Total Balance Overall
+        // Total Balance Overall - Now column 7 (colSpan 2)
         cell = footerRow.insertCell();
-        cell.colSpan = 2; // Span across Total for Account, Daily Total Time
+        cell.colSpan = 3; // Span across Total for Account, Daily Total Time
         // Recalculate grand total balance using the logic from main dashboard
         let grandTotalBalance = 0;
         recordsSnapshot.forEach(docSnap => {
@@ -1948,7 +1957,7 @@ const loadAndDisplayWorkRecords = async (userId = null, date = null) => {
         if (recordsSnapshot.empty) {
             const row = workRecordsTableBody.insertRow();
             const cell = row.insertCell(0);
-            cell.colSpan = 7;
+            cell.colSpan = 6; // Adjusted colspan from 7 to 6
             cell.textContent = getTranslatedText('noMatchingRecords');
             cell.style.textAlign = 'center';
         } else {
@@ -1959,9 +1968,32 @@ const loadAndDisplayWorkRecords = async (userId = null, date = null) => {
                 row.insertCell().textContent = record.userName;
                 row.insertCell().textContent = record.accountName;
                 row.insertCell().textContent = record.taskDefinitionName;
-                row.insertCell().textContent = formatNumberToEnglish(record.totalTasksCount);
-                row.insertCell().textContent = formatNumberToEnglish(formatMinutesToMMSS(record.totalTime)); // Format total time
-                row.insertCell().textContent = record.timestamp ? new Date(record.timestamp.toDate()).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }) : 'N/A'; // Format date to English digits
+                // Removed row.insertCell().textContent = formatNumberToEnglish(record.totalTasksCount);
+
+                const totalTimeCell = row.insertCell(); // This is now the "إجمالي الوقت (دقيقة)" cell
+                totalTimeCell.textContent = formatNumberToEnglish(formatMinutesToMMSS(record.totalTime)); // Format total time
+                
+                // Construct tooltip for totalTimeCell
+                const taskCountsByTiming = {};
+                record.recordedTimings.forEach(rt => {
+                    const timingKey = rt.timing.toFixed(1);
+                    taskCountsByTiming[timingKey] = (taskCountsByTiming[timingKey] || 0) + 1;
+                });
+
+                const tooltipContent = Object.keys(taskCountsByTiming)
+                    .map(timing => {
+                        const count = taskCountsByTiming[timing];
+                        const formattedTime = formatMinutesToMMSS(parseFloat(timing));
+                        return getTranslatedText('tasksSummaryTooltip', {
+                            count: formatNumberToEnglish(count),
+                            time: formatNumberToEnglish(formattedTime)
+                        });
+                    })
+                    .join('\n'); // Join with newline for multi-line tooltip
+
+                totalTimeCell.title = tooltipContent; // Set the tooltip
+
+                row.insertCell().textContent = record.timestamp ? new Date(record.timestamp.toDate()).toLocaleDateString(currentLanguage, { day: 'numeric', month: 'short' }) : 'N/A'; // Format date as "1 May"
                 
                 const actionCell = row.insertCell();
                 const editBtn = document.createElement('button');
@@ -2146,11 +2178,11 @@ const renderEmployeeRatesAndTotals = async () => {
             if (accountsWorkedOn.length === 0) {
                 // If user hasn't worked on any account, display a single row for the user with "No data"
                 const row = employeeRatesTableBody.insertRow();
+                row.insertCell().textContent = ''; // Empty cell for icon
                 row.insertCell().textContent = user.name;
                 row.insertCell().textContent = getTranslatedText('noDataToShow'); // Account Name
                 row.insertCell().textContent = getTranslatedText('notSet'); // Default Price
                 row.insertCell().textContent = getTranslatedText('notSet'); // Custom Price
-                row.insertCell().textContent = ''; // Actions cell (empty)
                 row.insertCell().textContent = getTranslatedText('notSet'); // Account Total Time
                 row.insertCell().textContent = getTranslatedText('notSet'); // Account Balance
                 row.insertCell().textContent = formatNumberToEnglish(userData.totalHours.toFixed(2)); // Total Hours
@@ -2165,6 +2197,14 @@ const renderEmployeeRatesAndTotals = async () => {
 
                     const row = employeeRatesTableBody.insertRow();
                     
+                    // New: Icon cell
+                    const iconCell = row.insertCell();
+                    const editIcon = document.createElement('span');
+                    editIcon.classList.add('edit-icon-circle');
+                    editIcon.innerHTML = '<i class="fas fa-pencil-alt"></i>'; // Pencil icon
+                    editIcon.addEventListener('click', () => openEditEmployeeRateModal(user.id, user.name, account.id, account.name, defaultPrice, customPrice, customRateDocId));
+                    iconCell.appendChild(editIcon);
+
                     // Employee Name (span rows if multiple accounts for same user)
                     if (isFirstRowForUser) {
                         const cell = row.insertCell();
@@ -2179,12 +2219,7 @@ const renderEmployeeRatesAndTotals = async () => {
                     const customPriceCell = row.insertCell();
                     customPriceCell.textContent = customPrice !== null ? formatNumberToEnglish(customPrice.toFixed(2)) : getTranslatedText('notSet');
 
-                    const actionsCell = row.insertCell();
-                    const modifyBtn = document.createElement('button');
-                    modifyBtn.textContent = getTranslatedText('modify'); 
-                    modifyBtn.classList.add('admin-action-btntp', 'primary');
-                    modifyBtn.addEventListener('click', () => openEditEmployeeRateModal(user.id, user.name, account.id, account.name, defaultPrice, customPrice, customRateDocId));
-                    actionsCell.appendChild(modifyBtn);
+                    // Removed actionsCell and modifyBtn
 
                     // New: Account Total Time (HH:MM:SS format with tooltip for minutes:seconds)
                     const accountTotalMinutes = userData.workedAccounts.get(account.id) || 0;
