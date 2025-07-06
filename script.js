@@ -25,9 +25,11 @@ let selectedAccount = null; // The account selected for the current work session
 let selectedTaskDefinition = null; // The task definition selected for the current work session
 let currentSessionTasks = []; // Tasks added in the current unsaved session
 let isSavingWork = false; // Flag to prevent beforeunload warning during save
+let lastClickTime = null; // For "time between clicks" feature
 
-// Constants (HOURLY_RATE will now be dynamic based on account/custom rate)
-// const HOURLY_RATE = 75; // This will be removed or made dynamic
+// Constants
+const SESSION_DURATION_MS = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
+const SESSION_CLOSED_BROWSER_MS = 1 * 60 * 60 * 1000; // 1 hour if browser closed
 
 // DOM Elements
 const loginPage = document.getElementById('loginPage');
@@ -41,7 +43,7 @@ const pinInputs = [];
 for (let i = 1; i <= 8; i++) {
     pinInputs.push(document.getElementById(`pinInput${i}`));
 }
-const loginError = document.getElementById('loginError');
+// const loginError = document.getElementById('loginError'); // Removed, now using modal
 
 // Main Dashboard Elements
 const userNameDisplay = document.getElementById('userNameDisplay');
@@ -50,6 +52,7 @@ const totalBalanceDisplay = document.getElementById('totalBalanceDisplay'); // N
 const startWorkOptionBtn = document.getElementById('startWorkOption');
 const trackWorkOptionBtn = document.getElementById('trackWorkOption');
 const logoutDashboardBtn = document.getElementById('logoutDashboardBtn'); // Logout from main dashboard
+let adminPanelButton = null; // Will be created dynamically
 
 // Track Work Page Elements (now includes chart)
 const taskChartCanvas = document.getElementById('taskChart'); // Canvas for chart (now on track work page)
@@ -137,11 +140,13 @@ const langEnBtn = document.getElementById('langEnBtn');
 const darkModeToggle = document.getElementById('darkModeToggle');
 const darkModeIcon = darkModeToggle ? darkModeToggle.querySelector('i') : null;
 
+// New Login Error Modal Elements
+const loginErrorModal = document.getElementById('loginErrorModal');
+const loginErrorModalTitle = document.getElementById('loginErrorModalTitle');
+const loginErrorModalMessage = document.getElementById('loginErrorModalMessage');
+const closeLoginErrorModalBtn = document.getElementById('closeLoginErrorModal');
+const loginErrorModalCloseBtn = document.getElementById('loginErrorModalCloseBtn');
 
-// 2. Global Variables (Updated)
-// HOURLY_RATE is now dynamic, so removed from constants.
-// SESSION_DURATION_MS remains for session expiry.
-const SESSION_DURATION_MS = 2 * 60 * 60 * 1000; // 2 hours in milliseconds (Changed from 3 hours)
 
 // 3. Utility Functions
 
@@ -165,6 +170,7 @@ const showPage = (pageElement) => {
     }
     editRecordModal.style.display = 'none'; // Ensure modal is hidden
     editEmployeeRateModal.style.display = 'none'; // Ensure new modal is hidden
+    loginErrorModal.style.display = 'none'; // Ensure login error modal is hidden
 };
 
 // Function to show toast messages (notifications)
@@ -215,6 +221,8 @@ const toggleDarkMode = () => {
     if (taskChart) {
         renderTrackWorkPage(); // Re-render chart to apply new colors (will also re-render table)
     }
+    // Re-apply translations to update colors of translated elements if they change with dark mode
+    applyTranslations();
 };
 
 const updateDarkModeIcon = (isDarkMode) => {
@@ -386,7 +394,7 @@ const translations = {
         'totalTasksOverall': 'إجمالي عدد المهام', 
         'totalTimeOverall': ' الوقت', 
         'totalBalanceOverall': ' الرصيد', 
-        'sessionWarning': 'ستنتهي جلستك بعد ساعتين أو بعد ساعة من إغلاق المتصفح. هل ترغب في تسجيل الخروج الآن؟',
+        'sessionWarning': 'ستنتهي جلستك بعد {duration} أو {closedBrowserDuration} من إغلاق المتصفح. هل ترغب في تسجيل الخروج الآن؟', // Updated
         'manageEmployeeRates': 'إدارة أسعار الموظفين والإجماليات', // New
         'employeeNameColumn': 'الموظف', // New
         'customPriceColumn': 'السعر المخصص/ساعة', // New
@@ -402,7 +410,12 @@ const translations = {
         'invalidPrice': 'يرجى إدخال سعر صالح.', // New
         'modify': 'تعديل', // New
         'notSet': 'غير محدد', // New
-        'unauthorizedAccess': 'وصول غير مصرح به. يرجى تسجيل الدخول كمسؤول.' // New
+        'unauthorizedAccess': 'وصول غير مصرح به. يرجى تسجيل الدخول كمسؤول.', // New
+        'error': 'خطأ', // New translation for modal title
+        'close': 'إغلاق', // New translation for modal button
+        'accountTotalTimeColumn': 'إجمالي وقت الحساب', // New
+        'accountBalanceColumn': 'رصيد الحساب', // New
+        'timeSinceLastClick': 'آخر نقرة منذ {minutes} دقيقة و {seconds} ثانية.' // New
     },
     'en': {
         'loginTitle': 'Login',
@@ -525,7 +538,7 @@ const translations = {
         'totalTasksOverall': 'Total Tasks Overall', 
         'totalTimeOverall': 'Total Time Overall', 
         'totalBalanceOverall': 'Total Balance Overall', 
-        'sessionWarning': 'Your session will expire in 2 hours or 1 hour after closing the browser. Do you want to log out now?',
+        'sessionWarning': 'Your session will expire in {duration} or {closedBrowserDuration} after closing the browser. Do you want to log out now?', // Updated
         'manageEmployeeRates': 'Manage Employee Rates & Totals', // New
         'employeeNameColumn': 'Employee', // New
         'customPriceColumn': 'Custom Price/Hour', // New
@@ -541,7 +554,12 @@ const translations = {
         'invalidPrice': 'Please enter a valid price.', // New
         'modify': 'Modify', // New
         'notSet': 'Not Set', // New
-        'unauthorizedAccess': 'Unauthorized access. Please log in as an administrator.' // New
+        'unauthorizedAccess': 'Unauthorized access. Please log in as an administrator.', // New
+        'error': 'Error', // New translation for modal title
+        'close': 'Close', // New translation for modal button
+        'accountTotalTimeColumn': 'Account Total Time', // New
+        'accountBalanceColumn': 'Account Balance', // New
+        'timeSinceLastClick': 'Last click was {minutes} minutes and {seconds} seconds ago.' // New
     }
 };
 
@@ -601,6 +619,10 @@ const applyTranslations = () => {
             } else {
                 element.textContent = getTranslatedText(key);
             }
+        } else if (key === 'sessionWarning') { // Special handling for session warning to include dynamic duration
+            const durationHours = SESSION_DURATION_MS / (60 * 60 * 1000);
+            const closedBrowserDurationHours = SESSION_CLOSED_BROWSER_MS / (60 * 60 * 1000);
+            element.textContent = getTranslatedText(key, { duration: `${durationHours} ${getTranslatedText('hoursUnit')}`, closedBrowserDuration: `${closedBrowserDurationHours} ${getTranslatedText('hourUnitSingular')}` });
         }
         else {
             element.textContent = getTranslatedText(key);
@@ -636,6 +658,11 @@ const applyTranslations = () => {
     if (trackWorkPage.style.display === 'flex') {
         renderTrackWorkPage();
     }
+};
+
+// Function to format numbers to English digits
+const formatNumberToEnglish = (num) => {
+    return num.toLocaleString('en-US', { useGrouping: false });
 };
 
 // 4. Session Management Functions
@@ -686,8 +713,11 @@ window.addEventListener('beforeunload', (event) => {
         // This will show the browser's default "Are you sure you want to leave?" prompt.
         // Custom modals are not allowed here for security reasons.
         event.preventDefault();
-        event.returnValue = getTranslatedText('sessionWarning');
-        return getTranslatedText('sessionWarning');
+        event.returnValue = getTranslatedText('sessionWarning', {
+            duration: `${SESSION_DURATION_MS / (60 * 60 * 1000)} ${getTranslatedText('hoursUnit')}`,
+            closedBrowserDuration: `${SESSION_CLOSED_BROWSER_MS / (60 * 60 * 1000)} ${getTranslatedText('hourUnitSingular')}`
+        });
+        return event.returnValue;
     }
 });
 
@@ -719,14 +749,20 @@ const fetchAllStaticData = async () => {
     }
 };
 
-// 5. Login Logic (Updated for 8 PIN fields)
+// Function to show the custom login error modal
+const showLoginErrorModal = (message) => {
+    loginErrorModalTitle.textContent = getTranslatedText('error');
+    loginErrorModalMessage.textContent = message;
+    loginErrorModal.style.display = 'flex'; // Use flex to center
+};
+
+// 5. Login Logic (Updated for 8 PIN fields and custom error modal)
 const handleLogin = async () => {
     const fullPin = pinInputs.map(input => input.value).join('');
-    loginError.style.display = 'none';
+    loginErrorModal.style.display = 'none'; // Hide any previous error modal
 
     if (fullPin.length !== 8 || !/^\d+$/.test(fullPin)) { // Check for 8 digits only
-        loginError.textContent = getTranslatedText('pinError');
-        loginError.style.display = 'block';
+        showLoginErrorModal(getTranslatedText('pinError'));
         return;
     }
 
@@ -783,19 +819,16 @@ const handleLogin = async () => {
             return;
         }
 
-        loginError.textContent = getTranslatedText('pinIncorrect');
-        loginError.style.display = 'block';
+        showLoginErrorModal(getTranslatedText('pinIncorrect')); // Use custom modal for incorrect PIN
 
     } catch (error) {
         console.error("Login error:", error);
         // Check if the error is due to network or permissions
         if (error.code === 'unavailable' || error.code === 'permission-denied') {
-            showToastMessage(getTranslatedText('noInternet') + ' أو مشكلة في الصلاحيات.', 'error');
+            showLoginErrorModal(getTranslatedText('noInternet') + ' أو مشكلة في الصلاحيات.');
         } else {
-            showToastMessage(getTranslatedText('loginError'), 'error');
+            showLoginErrorModal(getTranslatedText('loginError'));
         }
-        loginError.textContent = getTranslatedText('loginError'); // Update login error message
-        loginError.style.display = 'block';
     } finally {
         showLoadingIndicator(false);
     }
@@ -857,8 +890,8 @@ const renderMainDashboard = async () => {
             });
         }
 
-        totalHoursDisplay.textContent = formatTotalMinutesToHHMMSS(totalMinutesWorked); // Display in HH:MM:SS
-        totalBalanceDisplay.textContent = totalBalance.toFixed(2); // Display total balance
+        totalHoursDisplay.textContent = formatNumberToEnglish(formatTotalMinutesToHHMMSS(totalMinutesWorked)); // Display in HH:MM:SS
+        totalBalanceDisplay.textContent = formatNumberToEnglish(totalBalance.toFixed(2)); // Display total balance
 
     } catch (error) {
         console.error("Error rendering dashboard:", error);
@@ -913,8 +946,8 @@ const fetchAccountsAndTasks = async () => {
 
 const initializeStartWorkPage = async () => {
     currentSessionTasks = [];
-    completedTasksCount.textContent = '0';
-    recordedTotalTime.textContent = '00:00'; // Initial display formatted
+    completedTasksCount.textContent = formatNumberToEnglish(0);
+    recordedTotalTime.textContent = formatNumberToEnglish('00:00'); // Initial display formatted
     detailedSummaryContainer.innerHTML = ''; // Clear detailed summary
     taskTimingButtonsContainer.innerHTML = '';
     selectedAccount = null;
@@ -923,6 +956,7 @@ const initializeStartWorkPage = async () => {
     taskSelectionPopup.style.display = 'flex'; // Show popup for selection (using flex)
     accountSelect.value = "";
     taskTypeSelect.value = "";
+    lastClickTime = null; // Reset last click time for new session
     await fetchAccountsAndTasks(); // This now uses cached data
 };
 
@@ -968,9 +1002,34 @@ const renderTaskTimingButtons = () => {
 
             const button = document.createElement('button');
             button.classList.add('task-timing-btn');
-            button.textContent = `${formatMinutesToMMSS(timingValue)}`; // Use formatted time
+            button.textContent = formatNumberToEnglish(formatMinutesToMMSS(timingValue)); // Use formatted time with English digits
             button.dataset.timing = timingValue;
+
+            // Create a small message div for time between clicks
+            const timeMessageDiv = document.createElement('div');
+            timeMessageDiv.classList.add('time-since-last-click');
+            timeMessageDiv.style.display = 'none'; // Initially hidden
+            wrapper.appendChild(timeMessageDiv);
+
             button.addEventListener('click', () => {
+                const now = Date.now();
+                if (lastClickTime) {
+                    const diffMs = now - lastClickTime;
+                    const diffSeconds = Math.floor(diffMs / 1000);
+                    const minutes = Math.floor(diffSeconds / 60);
+                    const seconds = diffSeconds % 60;
+                    timeMessageDiv.textContent = getTranslatedText('timeSinceLastClick', {
+                        minutes: formatNumberToEnglish(minutes),
+                        seconds: formatNumberToEnglish(seconds)
+                    });
+                    timeMessageDiv.style.display = 'block';
+                    // Hide message after 3 seconds
+                    setTimeout(() => {
+                        timeMessageDiv.style.display = 'none';
+                    }, 3000);
+                }
+                lastClickTime = now; // Update last click time
+
                 currentSessionTasks.push({
                     accountId: selectedAccount.id,
                     accountName: selectedAccount.name,
@@ -1028,8 +1087,8 @@ const updateWorkSummary = () => {
         totalTime += task.timing; // Global total time
     });
 
-    completedTasksCount.textContent = totalCount;
-    recordedTotalTime.textContent = formatMinutesToMMSS(totalTime); // Use formatted time
+    completedTasksCount.textContent = formatNumberToEnglish(totalCount);
+    recordedTotalTime.textContent = formatNumberToEnglish(formatMinutesToMMSS(totalTime)); // Use formatted time
 
     detailedSummaryContainer.innerHTML = ''; // Clear previous content
 
@@ -1046,9 +1105,9 @@ const updateWorkSummary = () => {
             const summary = timingSummary[timing];
             const p = document.createElement('p');
             p.textContent = getTranslatedText('tasksTiming', {
-                timing: formatMinutesToMMSS(parseFloat(timing)), // Use formatted time
-                count: summary.count,
-                totalTime: formatMinutesToMMSS(summary.totalTime) // Use formatted time
+                timing: formatNumberToEnglish(formatMinutesToMMSS(parseFloat(timing))), // Use formatted time
+                count: formatNumberToEnglish(summary.count),
+                totalTime: formatNumberToEnglish(formatMinutesToMMSS(summary.totalTime)) // Use formatted time
             });
             detailedSummaryContainer.appendChild(p);
         });
@@ -1101,7 +1160,8 @@ const saveWorkRecord = async () => { // Renamed for clarity
         isSavingWork = false; // Reset flag
         showPage(mainDashboard);
         await renderMainDashboard();
-    } catch (error) {
+    }
+    catch (error) {
         console.error("Error saving work:", error);
         showToastMessage(getTranslatedText('errorSavingWork'), 'error');
     } finally {
@@ -1347,15 +1407,16 @@ const renderTrackWorkPage = async () => {
                         // Column 1: Serial Number (per account)
                         if (!accountRowSpanHandled) {
                             const cell = row.insertCell();
-                            cell.textContent = serialCounter++; // Increment serial per account
+                            cell.textContent = formatNumberToEnglish(serialCounter++); // Increment serial per account
                             cell.rowSpan = accountData.totalRows;
                             cell.classList.add('total-cell');
                         }
 
-                        // Column 2: Date (per date) - Removed time
+                        // Column 2: Date (per date)
                         if (!dateRowSpanHandled) {
                             const cell = row.insertCell();
-                            cell.textContent = new Date(dateKey).toLocaleDateString(currentLanguage === 'ar' ? 'ar-EG' : 'en-US');
+                            // Ensure date is formatted without time and stays on one line
+                            cell.textContent = new Date(dateKey).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
                             cell.rowSpan = dateData.totalRows;
                             cell.classList.add('total-cell', 'date-cell'); // Add date-cell class
                         }
@@ -1379,7 +1440,7 @@ const renderTrackWorkPage = async () => {
                         const timingValueCell = row.insertCell();
                         const currentTiming = timingsCount > 0 ? taskData.timings[sortedTimings[i]] : null;
                         if (currentTiming) {
-                            timingValueCell.textContent = formatMinutesToMMSS(parseFloat(sortedTimings[i]));
+                            timingValueCell.textContent = formatNumberToEnglish(formatMinutesToMMSS(parseFloat(sortedTimings[i])));
                         } else {
                             timingValueCell.textContent = '00:00';
                         }
@@ -1387,23 +1448,23 @@ const renderTrackWorkPage = async () => {
                         // Column 6: Completed Tasks (per timing)
                         const completedTasksCell = row.insertCell();
                         if (currentTiming) {
-                            completedTasksCell.textContent = currentTiming.count;
+                            completedTasksCell.textContent = formatNumberToEnglish(currentTiming.count);
                         } else {
-                            completedTasksCell.textContent = '0';
+                            completedTasksCell.textContent = formatNumberToEnglish(0);
                         }
 
                         // Column 7: Total Time (per timing)
                         const totalTimeCell = row.insertCell();
                         if (currentTiming) {
-                            totalTimeCell.textContent = formatMinutesToMMSS(currentTiming.totalTime);
+                            totalTimeCell.textContent = formatNumberToEnglish(formatMinutesToMMSS(currentTiming.totalTime));
                         } else {
-                            totalTimeCell.textContent = '00:00';
+                            totalTimeCell.textContent = formatNumberToEnglish('00:00');
                         }
 
                         // Column 8: Total for Task (per task record)
                         if (!taskRowSpanHandled) {
                             const cell = row.insertCell();
-                            cell.textContent = `${formatMinutesToMMSS(taskData.taskTotalTime)} (${taskData.taskTotalBalance.toFixed(2)} ${getTranslatedText('currencyUnit')})`;
+                            cell.textContent = `${formatNumberToEnglish(formatMinutesToMMSS(taskData.taskTotalTime))} (${formatNumberToEnglish(taskData.taskTotalBalance.toFixed(2))} ${getTranslatedText('currencyUnit')})`;
                             cell.rowSpan = actualTaskRows;
                             cell.classList.add('total-cell');
                         }
@@ -1411,7 +1472,7 @@ const renderTrackWorkPage = async () => {
                         // Column 9: Total for Account (per account)
                         if (!accountRowSpanHandled) {
                             const cell = row.insertCell();
-                            cell.textContent = `${formatMinutesToMMSS(accountData.accountTotalTime)} (${accountData.accountTotalBalance.toFixed(2)} ${getTranslatedText('currencyUnit')})`;
+                            cell.textContent = `${formatNumberToEnglish(formatMinutesToMMSS(accountData.accountTotalTime))} (${formatNumberToEnglish(accountData.accountTotalBalance.toFixed(2))} ${getTranslatedText('currencyUnit')})`;
                             cell.rowSpan = accountData.totalRows;
                             cell.classList.add('total-cell');
                         }
@@ -1419,7 +1480,7 @@ const renderTrackWorkPage = async () => {
                         // Column 10: Daily Total Time (per date) - New column
                         if (!dateRowSpanHandled) {
                             const cell = row.insertCell();
-                            cell.textContent = `${formatMinutesToMMSS(dateData.dateTotalTime)} (${dateData.dateTotalBalance.toFixed(2)} ${getTranslatedText('currencyUnit')})`; // Display daily total
+                            cell.textContent = `${formatNumberToEnglish(formatMinutesToMMSS(dateData.dateTotalTime))} (${formatNumberToEnglish(dateData.dateTotalBalance.toFixed(2))} ${getTranslatedText('currencyUnit')})`; // Display daily total
                             cell.rowSpan = dateData.totalRows;
                             cell.classList.add('total-cell', 'daily-total-cell'); // Add daily-total-cell class
                         }
@@ -1451,13 +1512,13 @@ const renderTrackWorkPage = async () => {
         // Total Tasks Overall value
         cell = footerRow.insertCell();
         cell.colSpan = 2; // Span across Timing Value, Completed Tasks
-        cell.textContent = `${getTranslatedText('totalTasksOverall')}: ${grandTotalTasks}`;
+        cell.textContent = `${getTranslatedText('totalTasksOverall')}: ${formatNumberToEnglish(grandTotalTasks)}`;
         cell.classList.add('grand-total-value');
 
         // Total Time Overall value
         cell = footerRow.insertCell();
         cell.colSpan = 2; // Span across Total Time, Total for Task
-        cell.textContent = `${getTranslatedText('totalTimeOverall')}: ${formatTotalMinutesToHHMMSS(grandTotalTime)}`;
+        cell.textContent = `${getTranslatedText('totalTimeOverall')}: ${formatNumberToEnglish(formatTotalMinutesToHHMMSS(grandTotalTime))}`;
         cell.classList.add('grand-total-value');
 
         // Total Balance Overall
@@ -1476,7 +1537,7 @@ const renderTrackWorkPage = async () => {
                 grandTotalBalance += (record.totalTime / 60) * pricePerHour;
             }
         });
-        cell.textContent = `${getTranslatedText('totalBalanceOverall')}: ${grandTotalBalance.toFixed(2)} ${getTranslatedText('currencyUnit')}`;
+        cell.textContent = `${getTranslatedText('totalBalanceOverall')}: ${formatNumberToEnglish(grandTotalBalance.toFixed(2))} ${getTranslatedText('currencyUnit')}`;
         cell.classList.add('grand-total-value');
 
         // Apply styling to grand total cells
@@ -1511,8 +1572,10 @@ const renderAdminPanel = async () => {
         await loadAndDisplayAccounts();
         await loadAndDisplayTaskDefinitions();
         await populateUserFilter(); // Populate user filter dropdown
-        recordFilterDate.valueAsDate = new Date(); // Set default date to today
-        await loadAndDisplayWorkRecords(null, recordFilterDate.value); // Load all records initially for today
+        // Clear filter fields on load
+        recordFilterDate.value = ''; // Clear date filter
+        recordFilterUser.value = ''; // Clear user filter (sets to "All Users")
+        await loadAndDisplayWorkRecords(null, null); // Load all records initially
         await renderEmployeeRatesAndTotals(); // New function call
     } catch (error) {
         console.error("Error rendering admin panel:", error);
@@ -1539,7 +1602,7 @@ const loadAndDisplayUsers = async () => {
                 console.log("Processing user for admin panel:", user.name); // Debug log for each user
                 const row = usersTableBody.insertRow();
                 row.insertCell().textContent = user.name;
-                row.insertCell().textContent = user.pin;
+                row.insertCell().textContent = formatNumberToEnglish(user.pin);
                 const actionCell = row.insertCell();
                 const deleteBtn = document.createElement('button');
                 deleteBtn.textContent = getTranslatedText('deleteBtn');
@@ -1628,7 +1691,7 @@ const loadAndDisplayAccounts = async () => {
                 console.log("Processing account for admin panel:", account.name); // Debug log
                 const row = accountsTableBody.insertRow();
                 row.insertCell().textContent = account.name;
-                row.insertCell().textContent = (account.defaultPricePerHour || 0).toFixed(2); // Display default price
+                row.insertCell().textContent = formatNumberToEnglish((account.defaultPricePerHour || 0).toFixed(2)); // Display default price
                 const actionCell = row.insertCell();
                 const deleteBtn = document.createElement('button');
                 deleteBtn.textContent = getTranslatedText('deleteBtn');
@@ -1714,8 +1777,8 @@ const loadAndDisplayTaskDefinitions = async () => {
                 
                 const timingsCell = row.insertCell();
                 if (task.timings && task.timings.length > 0) {
-                    // Display timings in MM:SS format
-                    const timingStrings = task.timings.map(t => formatMinutesToMMSS(t));
+                    // Display timings in MM:SS format with English digits
+                    const timingStrings = task.timings.map(t => formatNumberToEnglish(formatMinutesToMMSS(t)));
                     timingsCell.textContent = timingStrings.join(', ');
                 } else {
                     timingsCell.textContent = getTranslatedText('noTimings'); // Or empty
@@ -1890,9 +1953,9 @@ const loadAndDisplayWorkRecords = async (userId = null, date = null) => {
                 row.insertCell().textContent = record.userName;
                 row.insertCell().textContent = record.accountName;
                 row.insertCell().textContent = record.taskDefinitionName;
-                row.insertCell().textContent = record.totalTasksCount;
-                row.insertCell().textContent = formatMinutesToMMSS(record.totalTime); // Format total time
-                row.insertCell().textContent = record.timestamp ? new Date(record.timestamp.toDate()).toLocaleDateString(currentLanguage === 'ar' ? 'ar-EG' : 'en-US') : 'N/A'; // Format date
+                row.insertCell().textContent = formatNumberToEnglish(record.totalTasksCount);
+                row.insertCell().textContent = formatNumberToEnglish(formatMinutesToMMSS(record.totalTime)); // Format total time
+                row.insertCell().textContent = record.timestamp ? new Date(record.timestamp.toDate()).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }) : 'N/A'; // Format date to English digits
                 
                 const actionCell = row.insertCell();
                 const editBtn = document.createElement('button');
@@ -1955,8 +2018,8 @@ const openEditRecordModal = (record) => {
     });
     editTaskTypeSelect.value = record.taskDefinitionId;
 
-    editTotalTasksCount.value = record.totalTasksCount;
-    editTotalTime.value = record.totalTime.toFixed(2); // Keep as decimal for input
+    editTotalTasksCount.value = formatNumberToEnglish(record.totalTasksCount);
+    editTotalTime.value = formatNumberToEnglish(record.totalTime.toFixed(2)); // Keep as decimal for input
 
     // Populate date and time inputs
     if (record.timestamp) {
@@ -2082,8 +2145,10 @@ const renderEmployeeRatesAndTotals = async () => {
                 row.insertCell().textContent = getTranslatedText('notSet'); // Default Price
                 row.insertCell().textContent = getTranslatedText('notSet'); // Custom Price
                 row.insertCell().textContent = ''; // Actions cell (empty)
-                row.insertCell().textContent = userData.totalHours.toFixed(2); // Total Hours
-                row.insertCell().textContent = `${userData.totalBalance.toFixed(2)} ${getTranslatedText('currencyUnit')}`; // Total Balance
+                row.insertCell().textContent = getTranslatedText('notSet'); // Account Total Time
+                row.insertCell().textContent = getTranslatedText('notSet'); // Account Balance
+                row.insertCell().textContent = formatNumberToEnglish(userData.totalHours.toFixed(2)); // Total Hours
+                row.insertCell().textContent = `${formatNumberToEnglish(userData.totalBalance.toFixed(2))} ${getTranslatedText('currencyUnit')}`; // Total Balance
             } else {
                 let isFirstRowForUser = true;
                 accountsWorkedOn.forEach(account => {
@@ -2103,10 +2168,10 @@ const renderEmployeeRatesAndTotals = async () => {
                     }
 
                     row.insertCell().textContent = account.name;
-                    row.insertCell().textContent = defaultPrice.toFixed(2);
+                    row.insertCell().textContent = formatNumberToEnglish(defaultPrice.toFixed(2));
                     
                     const customPriceCell = row.insertCell();
-                    customPriceCell.textContent = customPrice !== null ? customPrice.toFixed(2) : getTranslatedText('notSet');
+                    customPriceCell.textContent = customPrice !== null ? formatNumberToEnglish(customPrice.toFixed(2)) : getTranslatedText('notSet');
 
                     const actionsCell = row.insertCell();
                     const modifyBtn = document.createElement('button');
@@ -2115,14 +2180,26 @@ const renderEmployeeRatesAndTotals = async () => {
                     modifyBtn.addEventListener('click', () => openEditEmployeeRateModal(user.id, user.name, account.id, account.name, defaultPrice, customPrice, customRateDocId));
                     actionsCell.appendChild(modifyBtn);
 
+                    // New: Account Total Time
+                    const accountTotalMinutes = userData.workedAccounts.get(account.id) || 0;
+                    const accountTotalTimeCell = row.insertCell();
+                    accountTotalTimeCell.textContent = `${formatNumberToEnglish(formatMinutesToMMSS(accountTotalMinutes))} / ${formatNumberToEnglish(formatTotalMinutesToHHMMSS(accountTotalMinutes))}`;
+
+                    // New: Account Balance
+                    const accountBalanceCell = row.insertCell();
+                    const accountPricePerHour = customPrice !== null ? customPrice : defaultPrice;
+                    const accountBalance = (accountTotalMinutes / 60) * accountPricePerHour;
+                    accountBalanceCell.textContent = `${formatNumberToEnglish(accountBalance.toFixed(2))} ${getTranslatedText('currencyUnit')}`;
+
+
                     // Total Hours and Total Balance (only for the first row of each user)
                     if (accountsWorkedOn.indexOf(account) === 0) { // This condition ensures it's the first row of the first account displayed for the user
                         const totalHoursCell = row.insertCell();
-                        totalHoursCell.textContent = userData.totalHours.toFixed(2);
+                        totalHoursCell.textContent = formatNumberToEnglish(userData.totalHours.toFixed(2));
                         totalHoursCell.rowSpan = accountsWorkedOn.length;
 
                         const totalBalanceCell = row.insertCell();
-                        totalBalanceCell.textContent = `${userData.totalBalance.toFixed(2)} ${getTranslatedText('currencyUnit')}`;
+                        totalBalanceCell.textContent = `${formatNumberToEnglish(userData.totalBalance.toFixed(2))} ${getTranslatedText('currencyUnit')}`;
                         totalBalanceCell.rowSpan = accountsWorkedOn.length;
                     }
                 });
@@ -2142,8 +2219,8 @@ const openEditEmployeeRateModal = (userId, userName, accountId, accountName, def
 
     modalEmployeeName.textContent = userName;
     modalAccountName.textContent = accountName;
-    modalDefaultPrice.textContent = defaultPrice.toFixed(2);
-    modalCustomPriceInput.value = customPrice !== null ? customPrice : defaultPrice; // Pre-fill with custom or default
+    modalDefaultPrice.textContent = formatNumberToEnglish(defaultPrice.toFixed(2));
+    modalCustomPriceInput.value = customPrice !== null ? formatNumberToEnglish(customPrice) : formatNumberToEnglish(defaultPrice); // Pre-fill with custom or default
 
     editEmployeeRateModal.style.display = 'flex';
 };
@@ -2235,6 +2312,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
+    // Event listeners for the new login error modal
+    closeLoginErrorModalBtn.addEventListener('click', () => {
+        loginErrorModal.style.display = 'none';
+    });
+    loginErrorModalCloseBtn.addEventListener('click', () => {
+        loginErrorModal.style.display = 'none';
+    });
+    window.addEventListener('click', (event) => {
+        if (event.target === loginErrorModal) {
+            loginErrorModal.style.display = 'none';
+        }
+    });
+
     // Check for logged-in user on load
     const storedUser = localStorage.getItem('loggedInUser');
     if (storedUser) {
@@ -2263,15 +2353,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     startWorkOptionBtn.addEventListener('click', handleStartWorkOptionClick); // Use named function
     trackWorkOptionBtn.addEventListener('click', handleTrackWorkOptionClick); // Use named function
 
-    // Add Admin Panel button dynamically if not already present
-    let adminPanelButton = document.getElementById('adminPanelOption');
-    if (!adminPanelButton) {
+    // Add Admin Panel button dynamically if not already present, and only for admin
+    adminPanelButton = document.getElementById('adminPanelOption');
+    if (!adminPanelButton) { // Only create if it doesn't exist
         adminPanelButton = document.createElement('button');
         adminPanelButton.id = 'adminPanelOption';
         adminPanelButton.classList.add('big-option-btn');
         adminPanelButton.setAttribute('data-key', 'adminPanelTitle'); // For translation
         adminPanelButton.textContent = getTranslatedText('adminPanelTitle'); // Initial text
         mainDashboard.querySelector('.dashboard-options').appendChild(adminPanelButton);
+    }
+    // Hide/show admin button based on loggedInUser role
+    if (loggedInUser && loggedInUser.id === 'admin') {
+        adminPanelButton.style.display = 'block'; // Or 'flex' depending on parent display
+    } else {
+        adminPanelButton.style.display = 'none';
     }
     adminPanelButton.addEventListener('click', async () => {
         if (loggedInUser && loggedInUser.id === 'admin') {
@@ -2343,4 +2439,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.addEventListener('offline', () => {
         showToastMessage(getTranslatedText('internetLost'), 'error');
     });
+
+    // Language and Dark Mode buttons
+    if (langArBtn) {
+        langArBtn.addEventListener('click', () => {
+            setLanguage('ar');
+            langArBtn.classList.add('active');
+            langEnBtn.classList.remove('active');
+        });
+    }
+    if (langEnBtn) {
+        langEnBtn.addEventListener('click', () => {
+            setLanguage('en');
+            langEnBtn.classList.add('active');
+            langArBtn.classList.remove('active');
+        });
+    }
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', toggleDarkMode);
+    }
 });
