@@ -1149,6 +1149,37 @@ body.dark-mode .track-work-container table tbody .daily-record-row {
     border-top: 2px solid #00e6e6;
 }
 
+/* New style for the circular edit icon */
+.edit-icon-circle {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px; /* Smaller size */
+    height: 24px; /* Smaller size */
+    border-radius: 50%;
+    background-color: #e0a800; /* Primary color for edit */
+    color: white;
+    cursor: pointer;
+    font-size: 12px; /* Smaller icon size */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.edit-icon-circle:hover {
+    background-color: #c79100;
+    transform: scale(1.1);
+}
+
+body.dark-mode .edit-icon-circle {
+    background-color: #00e6e6; /* Neon Cyan in dark mode */
+    color: #121212;
+}
+
+body.dark-mode .edit-icon-circle:hover {
+    background-color: #00cccc;
+}
+
+
 body.dark-mode .admin-action-btntp {
     background-color: #00e6e6 !important; /* Neon Cyan for modify in dark mode */
     color: #121212 !important;
