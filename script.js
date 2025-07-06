@@ -243,8 +243,7 @@ const formatMinutesToMMSS = (decimalMinutes) => {
         return '00:00';
     }
     // Convert total minutes to total seconds, then round to handle floating point inaccuracies
-    // Using Math.round to handle potential floating point errors when converting to seconds
-    const totalSeconds = Math.round(decimalMinutes * 60);
+    const totalSeconds = Math.round(decimalMinutes * 60); 
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     
@@ -1087,9 +1086,10 @@ const updateWorkSummary = () => {
     const timingSummary = {};
     
     currentSessionTasks.forEach(task => {
-        const timingKey = task.timing.toFixed(1); // Use fixed decimal for key consistency
+        // Use total seconds (multiplied by 1000 for precision) as the key for grouping to avoid floating point issues
+        const timingKey = Math.round(task.timing * 1000).toString(); 
         if (!timingSummary[timingKey]) {
-            timingSummary[timingKey] = { count: 0, totalTime: 0 };
+            timingSummary[timingKey] = { count: 0, totalTime: 0 }; // totalTime here will be in minutes
         }
         timingSummary[timingKey].count++;
         timingSummary[timingKey].totalTime += task.timing;
@@ -1108,14 +1108,16 @@ const updateWorkSummary = () => {
         heading.textContent = getTranslatedText('taskDetailsByTiming');
         detailedSummaryContainer.appendChild(heading);
         
-        // Sort timings for consistent display
+        // Sort timings for consistent display (convert key back to number for sorting)
         const sortedTimings = Object.keys(timingSummary).sort((a, b) => parseFloat(a) - parseFloat(b));
 
-        sortedTimings.forEach(timing => {
-            const summary = timingSummary[timing];
+        sortedTimings.forEach(timingKey => { // Renamed to timingKey to avoid confusion
+            const summary = timingSummary[timingKey];
             const p = document.createElement('p');
+            // Convert timingKey back to decimal minutes for display
+            const displayTimingMinutes = parseFloat(timingKey) / 1000; 
             p.textContent = getTranslatedText('tasksTiming', {
-                timing: formatNumberToEnglish(formatMinutesToMMSS(parseFloat(timing))), // Use formatted time
+                timing: formatNumberToEnglish(formatMinutesToMMSS(displayTimingMinutes)), // Use formatted time
                 count: formatNumberToEnglish(summary.count),
                 totalTime: formatNumberToEnglish(formatMinutesToMMSS(summary.totalTime)) // Use formatted time
             });
@@ -1231,7 +1233,7 @@ const renderTrackWorkPage = async () => {
         const userAccountRatesCol = collection(db, 'userAccountRates');
         const userRatesQuery = query(userAccountRatesCol, where('userId', '==', userId));
         const userRatesSnapshot = await getDocs(userRatesQuery);
-        const userCustomRatesMap = new Map(); // Map<accountId, customPricePerHour> - Corrected variable name
+        const userCustomRatesMap = new Map(); // Map<accountId, customPricePerHour>
         userRatesSnapshot.forEach(docSnap => {
             const rate = getDocData(docSnap);
             userCustomRatesMap.set(rate.accountId, rate.customPricePerHour);
@@ -1265,7 +1267,8 @@ const renderTrackWorkPage = async () => {
             }
 
             record.recordedTimings.forEach(rt => {
-                const timingKey = rt.timing.toFixed(1); // Use fixed decimal for key consistency
+                // Use total seconds (multiplied by 1000 for precision) as the key for grouping to avoid floating point issues
+                const timingKey = Math.round(rt.timing * 1000).toString(); 
                 if (!processedData[recordDate].accounts[record.accountId].tasks[taskRecordKey].timings[timingKey]) {
                     processedData[recordDate].accounts[record.accountId].tasks[taskRecordKey].timings[timingKey] = { count: 0, totalTime: 0 };
                 }
@@ -1403,6 +1406,7 @@ const renderTrackWorkPage = async () => {
 
                 for (const taskRecordKey of sortedTaskRecordKeys) {
                     const taskData = accountData.tasks[taskRecordKey];
+                    // Sort timings by their numerical value (after converting key back to number)
                     const sortedTimings = Object.keys(taskData.timings).sort((a, b) => parseFloat(a) - parseFloat(b));
                     const timingsCount = sortedTimings.length;
                     const actualTaskRows = timingsCount > 0 ? timingsCount : 1; // At least one row for task
@@ -1448,9 +1452,12 @@ const renderTrackWorkPage = async () => {
 
                         // Column 5: Timing Value (per timing)
                         const timingValueCell = row.insertCell();
-                        const currentTiming = timingsCount > 0 ? taskData.timings[sortedTimings[i]] : null;
+                        const currentTimingKey = sortedTimings[i];
+                        const currentTiming = timingsCount > 0 ? taskData.timings[currentTimingKey] : null;
                         if (currentTiming) {
-                            timingValueCell.textContent = formatNumberToEnglish(formatMinutesToMMSS(parseFloat(sortedTimings[i])));
+                            // Convert timingKey back to decimal minutes for display
+                            const displayTimingMinutes = parseFloat(currentTimingKey) / 1000;
+                            timingValueCell.textContent = formatNumberToEnglish(formatMinutesToMMSS(displayTimingMinutes));
                         } else {
                             timingValueCell.textContent = '00:00';
                         }
@@ -1473,11 +1480,13 @@ const renderTrackWorkPage = async () => {
                         
                         // Add tooltip for tasks summary to the totalTimeCell
                         const taskSummaryTooltip = Object.keys(taskData.timings)
-                            .map(timing => {
-                                const summary = taskData.timings[timing];
+                            .map(timingKey => { // Renamed to timingKey
+                                const summary = taskData.timings[timingKey];
+                                // Convert timingKey back to decimal minutes for display in tooltip
+                                const displayTimingMinutes = parseFloat(timingKey) / 1000;
                                 return getTranslatedText('tasksSummaryTooltip', {
                                     count: formatNumberToEnglish(summary.count),
-                                    time: formatNumberToEnglish(formatMinutesToMMSS(parseFloat(timing)))
+                                    time: formatNumberToEnglish(formatMinutesToMMSS(displayTimingMinutes))
                                 });
                             })
                             .join('\n'); // Join with newline for multi-line tooltip
@@ -1603,7 +1612,7 @@ const renderAdminPanel = async () => {
         console.error("Error rendering admin panel:", error);
         showToastMessage(getTranslatedText('errorLoadingData'), 'error');
     } finally {
-        showLoadingIndicator(false); // Hide loading indicator after all admin data is loaded
+        showLoadingIndicator(false);
     }
 };
 
@@ -1873,7 +1882,7 @@ const addTaskDefinition = async () => { // Renamed for clarity
         const seconds = parseInt(secInput.value);
 
         if (!isNaN(minutes) && minutes >= 0 && !isNaN(seconds) && seconds >= 0 && seconds < 60) {
-            const totalMinutes = minutes + (seconds / 60);
+            const totalMinutes = minutes + (seconds / 60); // This is the crucial line
             timings.push(totalMinutes);
             hasValidTimings = true;
         } else if (minInput.value !== '' || secInput.value !== '') { // If fields are not empty but invalid
@@ -1984,14 +1993,16 @@ const loadAndDisplayWorkRecords = async (userId = null, date = null) => {
                 // Construct tooltip for totalTimeCell
                 const taskCountsByTiming = {};
                 record.recordedTimings.forEach(rt => {
-                    const timingKey = rt.timing.toFixed(1);
+                    // Use total seconds (multiplied by 1000 for precision) as the key for grouping
+                    const timingKey = Math.round(rt.timing * 1000).toString(); 
                     taskCountsByTiming[timingKey] = (taskCountsByTiming[timingKey] || 0) + 1;
                 });
 
                 const tooltipContent = Object.keys(taskCountsByTiming)
-                    .map(timing => {
-                        const count = taskCountsByTiming[timing];
-                        const formattedTime = formatMinutesToMMSS(parseFloat(timing));
+                    .map(timingKey => { // Renamed to timingKey
+                        const count = taskCountsByTiming[timingKey];
+                        // Convert timingKey back to decimal minutes for display in tooltip
+                        const formattedTime = formatMinutesToMMSS(parseFloat(timingKey) / 1000);
                         return getTranslatedText('tasksSummaryTooltip', {
                             count: formatNumberToEnglish(count),
                             time: formatNumberToEnglish(formattedTime)
