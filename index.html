@@ -45,7 +45,7 @@
             <input type="tel" id="pinInput6" class="pin-input-field" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="off">
             <input type="tel" id="pinInput7" class="pin-input-field" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="off">
             <input type="tel" id="pinInput8" class="pin-input-field" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="off">
-            <p id="loginError" class="error-message" style="display: none;"></p>
+            <!-- Removed loginError paragraph, now handled by modal -->
         </div>
         <!-- Removed loginBtn as per new requirement -->
     </div>
@@ -65,6 +65,7 @@
         <div class="dashboard-options">
             <button id="startWorkOption" class="big-option-btn" data-key="startWorkOption">بدء العمل</button>
             <button id="trackWorkOption" class="big-option-btn" data-key="trackWorkOption">متابعة العمل</button>
+            <!-- Admin Panel button will be added dynamically by JS for admin user only -->
         </div>
         <button id="logoutDashboardBtn" class="back-btn" data-key="logoutAdmin">تسجيل الخروج</button>
     </div>
@@ -171,7 +172,6 @@
         </div>
 
         <div class="admin-section">
-            <button id="logoutAdminBtn" class="back-btn" data-key="logoutAdmin">تسجيل الخروج</button>
             <h2 data-key="manageAccounts">إدارة الحسابات</h2>
             <input type="text" id="newAccountNameInput" placeholder="اسم الحساب الجديد" data-key="newAccountName">
             <!-- New input for default price per hour for accounts -->
@@ -233,6 +233,8 @@
                             <th data-key="defaultPriceColumn">السعر الافتراضي/ساعة</th>
                             <th data-key="customPriceColumn">السعر المخصص/ساعة</th>
                             <th data-key="actionsColumn">إجراءات</th>
+                            <th data-key="accountTotalTimeColumn">إجمالي وقت الحساب</th> <!-- New Column -->
+                            <th data-key="accountBalanceColumn">رصيد الحساب</th> <!-- New Column -->
                             <th data-key="employeeTotalHoursColumn">إجمالي الساعات</th>
                             <th data-key="employeeTotalBalanceColumn">إجمالي الرصيد المستحق</th>
                         </tr>
@@ -272,13 +274,15 @@
                 </table>
             </div>
         </div>
+
+        <button id="logoutAdminBtn" class="back-btn" data-key="logoutAdmin">تسجيل الخروج</button>
     </div>
 
     <!-- Edit Record Modal -->
     <div id="editRecordModal" class="modal">
         <div class="modal-content">
             <span class="close-button">&times;</span>
-            <h3 data-key="editRecord">تعديل</h3>
+            <h3 data-key="editRecord">تعديل سجل العمل</h3>
             <label for="editAccountSelect" data-key="accountName">اسم الحساب:</label>
             <select id="editAccountSelect"></select>
 
@@ -314,6 +318,16 @@
             <input type="number" id="modalCustomPriceInput" step="0.01" min="0">
 
             <button id="saveCustomRateBtn" data-key="saveChangesBtn">حفظ التعديلات</button>
+        </div>
+    </div>
+
+    <!-- Custom Alert/Error Modal for Login PIN -->
+    <div id="loginErrorModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeLoginErrorModal">&times;</span>
+            <h3 id="loginErrorModalTitle" data-key="error">خطأ</h3>
+            <p id="loginErrorModalMessage"></p>
+            <button id="loginErrorModalCloseBtn" data-key="close">إغلاق</button>
         </div>
     </div>
 
