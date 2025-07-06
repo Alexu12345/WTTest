@@ -242,13 +242,10 @@ const formatMinutesToMMSS = (decimalMinutes) => {
     if (isNaN(decimalMinutes) || decimalMinutes < 0) {
         return '00:00';
     }
-    const minutes = Math.floor(decimalMinutes);
-    const seconds = Math.round((decimalMinutes - minutes) * 60);
-    
-    // Handle cases where seconds might round up to 60
-    if (seconds === 60) {
-        return `${minutes + 1}:00`;
-    }
+    // Convert total minutes to total seconds, then round to handle floating point inaccuracies
+    const totalSeconds = Math.round(decimalMinutes * 60); 
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
     
     const formattedMinutes = String(minutes).padStart(1, '0'); // No need for 2 digits if single digit
     const formattedSeconds = String(seconds).padStart(2, '0');
@@ -1158,7 +1155,7 @@ const saveWorkRecord = async () => { // Renamed for clarity
             })),
             totalTasksCount: currentSessionTasks.length, // Total count of tasks in this record
             totalTime: currentSessionTasks.reduce((sum, task) => sum + task.timing, 0), // Total time for this record
-            timestamp: serverTimestamp() // Use direct import serverTimestamp
+            timestamp: serverTimestamp() // Use client-side timestamp for session
         };
 
         await addDoc(collection(db, 'workRecords'), recordData); // Use direct imports addDoc, collection
@@ -1203,7 +1200,7 @@ const renderTrackWorkPage = async () => {
         if (recordsSnapshot.empty) {
             const row = trackTasksTableBody.insertRow();
             const cell = row.insertCell(0);
-            cell.colSpan = 10; // Adjusted colspan for new table structure (was 9)
+            cell.colSpan = 10; // Total columns in the table
             cell.textContent = getTranslatedText('noDataToShow');
             cell.style.textAlign = 'center';
             showLoadingIndicator(false);
@@ -1280,8 +1277,8 @@ const renderTrackWorkPage = async () => {
             // Calculate balance for this record using applicable price
             const account = accountsMap.get(record.accountId);
             let pricePerHour = account ? (account.defaultPricePerHour || 0) : 0;
-            if (userCustomRatesMap.has(record.accountId)) {
-                pricePerHour = userCustomRatesMap.get(record.accountId);
+            if (customRatesMap.has(record.userId) && customRatesMap.get(record.userId).has(record.accountId)) {
+                pricePerHour = customRatesMap.get(record.userId).get(record.accountId).customPricePerHour;
             }
             const recordBalance = (record.totalTime / 60) * pricePerHour;
             processedData[recordDate].accounts[record.accountId].tasks[taskRecordKey].taskTotalBalance += recordBalance;
@@ -1452,10 +1449,16 @@ const renderTrackWorkPage = async () => {
                             timingValueCell.textContent = '00:00';
                         }
 
-                        // Column 6: Completed Tasks (per timing) - REMOVED
-
-                        // Column 7: Total Time (per timing) - Now column 6
-                        const totalTimeCell = row.insertCell(); // This is the cell next to the removed "Completed Tasks"
+                        // Column 6: Completed Tasks (per timing) - RE-ADDED
+                        const completedTasksCell = row.insertCell();
+                        if (currentTiming) {
+                            completedTasksCell.textContent = formatNumberToEnglish(currentTiming.count);
+                        } else {
+                            completedTasksCell.textContent = formatNumberToEnglish(0);
+                        }
+                        
+                        // Column 7: Total Time (per timing) - Now column 7
+                        const totalTimeCell = row.insertCell(); 
                         if (currentTiming) {
                             totalTimeCell.textContent = formatNumberToEnglish(formatMinutesToMMSS(currentTiming.totalTime));
                         } else {
@@ -1472,10 +1475,10 @@ const renderTrackWorkPage = async () => {
                                 });
                             })
                             .join('\n'); // Join with newline for multi-line tooltip
-                        totalTimeCell.title = taskSummaryTooltip;
+                        totalTimeCell.title = tooltipContent;
 
 
-                        // Column 8: Total for Task (per task record) - Now column 7
+                        // Column 8: Total for Task (per task record) - Now column 8
                         if (!taskRowSpanHandled) {
                             const cell = row.insertCell();
                             cell.textContent = `${formatNumberToEnglish(formatMinutesToMMSS(taskData.taskTotalTime))} (${formatNumberToEnglish(taskData.taskTotalBalance.toFixed(2))} ${getTranslatedText('currencyUnit')})`;
@@ -1483,7 +1486,7 @@ const renderTrackWorkPage = async () => {
                             cell.classList.add('total-cell');
                         }
 
-                        // Column 9: Total for Account (per account) - Now column 8
+                        // Column 9: Total for Account (per account) - Now column 9
                         if (!accountRowSpanHandled) {
                             const cell = row.insertCell();
                             cell.textContent = `${formatNumberToEnglish(formatMinutesToMMSS(accountData.accountTotalTime))} (${formatNumberToEnglish(accountData.accountTotalBalance.toFixed(2))} ${getTranslatedText('currencyUnit')})`;
@@ -1491,7 +1494,7 @@ const renderTrackWorkPage = async () => {
                             cell.classList.add('total-cell');
                         }
 
-                        // Column 10: Daily Total Time (per date) - Now column 9
+                        // Column 10: Daily Total Time (per date) - Now column 10
                         if (!dateRowSpanHandled) {
                             const cell = row.insertCell();
                             cell.textContent = `${formatNumberToEnglish(formatMinutesToMMSS(dateData.dateTotalTime))} (${formatNumberToEnglish(dateData.dateTotalBalance.toFixed(2))} ${getTranslatedText('currencyUnit')})`; // Display daily total
@@ -1519,25 +1522,24 @@ const renderTrackWorkPage = async () => {
         
         // Grand Total label
         let cell = footerRow.insertCell();
-        cell.colSpan = 4; // Adjusted colspan
+        cell.colSpan = 5; // Adjusted colspan to account for re-added column
         cell.textContent = getTranslatedText('grandTotal');
         cell.classList.add('grand-total-label');
 
-        // Total Tasks Overall value - REMOVED
-        // cell = footerRow.insertCell();
-        // cell.colSpan = 2; // Span across Timing Value, Completed Tasks
-        // cell.textContent = `${getTranslatedText('totalTasksOverall')}: ${formatNumberToEnglish(grandTotalTasks)}`;
-        // cell.classList.add('grand-total-value');
+        // Total Tasks Overall value (re-added)
+        cell = footerRow.insertCell();
+        cell.textContent = `${getTranslatedText('totalTasksOverall')}: ${formatNumberToEnglish(grandTotalTasks)}`;
+        cell.classList.add('grand-total-value');
 
-        // Total Time Overall value - Now column 5 (colSpan 2)
+        // Total Time Overall value - Now column 7 (colSpan 2)
         cell = footerRow.insertCell();
         cell.colSpan = 2; // Span across Total Time, Total for Task
         cell.textContent = `${getTranslatedText('totalTimeOverall')}: ${formatNumberToEnglish(formatTotalMinutesToHHMMSS(grandTotalTime))}`;
         cell.classList.add('grand-total-value');
 
-        // Total Balance Overall - Now column 7 (colSpan 2)
+        // Total Balance Overall - Now column 9 (colSpan 2)
         cell = footerRow.insertCell();
-        cell.colSpan = 3; // Span across Total for Account, Daily Total Time
+        cell.colSpan = 2; // Span across Total for Account, Daily Total Time
         // Recalculate grand total balance using the logic from main dashboard
         let grandTotalBalance = 0;
         recordsSnapshot.forEach(docSnap => {
