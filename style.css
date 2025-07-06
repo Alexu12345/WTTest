@@ -5,6 +5,7 @@
 /* Ensure text alignment is centered for table data and headers by default */
 td, th {
     text-align: center !important;
+    white-space: normal !important;
 }
 
 body {
