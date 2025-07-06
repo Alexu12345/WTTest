@@ -243,9 +243,15 @@ const formatMinutesToMMSS = (decimalMinutes) => {
         return '00:00';
     }
     // Convert total minutes to total seconds, then round to handle floating point inaccuracies
-    const totalSeconds = Math.round(decimalMinutes * 60); 
+    // Using Math.round to handle potential floating point errors when converting to seconds
+    const totalSeconds = Math.round(decimalMinutes * 60);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
+    
+    // Handle cases where seconds might round up to 60 (e.g., 59.9999 -> 60)
+    if (seconds === 60) {
+        return `${minutes + 1}:00`;
+    }
     
     const formattedMinutes = String(minutes).padStart(1, '0'); // No need for 2 digits if single digit
     const formattedSeconds = String(seconds).padStart(2, '0');
@@ -862,10 +868,10 @@ const renderMainDashboard = async () => {
         const accountsMap = new Map(allAccounts.map(acc => [acc.id, acc]));
 
         // Fetch custom rates for the logged-in user
-        const userCustomRatesMap = new Map(); // Map<accountId, customPricePerHour>
-        const userAccountRatesCol = collection(db, 'userAccountRates');
-        const userRatesQuery = query(userAccountRatesCol, where('userId', '==', userId));
+        const userCustomRatesCol = collection(db, 'userAccountRates');
+        const userRatesQuery = query(userCustomRatesCol, where('userId', '==', userId));
         const userRatesSnapshot = await getDocs(userRatesQuery);
+        const userCustomRatesMap = new Map(); // Map<accountId, customPricePerHour>
         userRatesSnapshot.forEach(docSnap => {
             const rate = getDocData(docSnap);
             userCustomRatesMap.set(rate.accountId, rate.customPricePerHour);
@@ -1222,10 +1228,10 @@ const renderTrackWorkPage = async () => {
         const accountsMap = new Map(allAccounts.map(acc => [acc.id, acc]));
 
         // Fetch custom rates for the logged-in user
-        const userCustomRatesMap = new Map(); // Map<accountId, customPricePerHour>
         const userAccountRatesCol = collection(db, 'userAccountRates');
         const userRatesQuery = query(userAccountRatesCol, where('userId', '==', userId));
         const userRatesSnapshot = await getDocs(userRatesQuery);
+        const userCustomRatesMap = new Map(); // Map<accountId, customPricePerHour> - Corrected variable name
         userRatesSnapshot.forEach(docSnap => {
             const rate = getDocData(docSnap);
             userCustomRatesMap.set(rate.accountId, rate.customPricePerHour);
@@ -1277,8 +1283,8 @@ const renderTrackWorkPage = async () => {
             // Calculate balance for this record using applicable price
             const account = accountsMap.get(record.accountId);
             let pricePerHour = account ? (account.defaultPricePerHour || 0) : 0;
-            if (customRatesMap.has(record.userId) && customRatesMap.get(record.userId).has(record.accountId)) {
-                pricePerHour = customRatesMap.get(record.userId).get(record.accountId).customPricePerHour;
+            if (userCustomRatesMap.has(record.accountId)) { // Corrected variable name here
+                pricePerHour = userCustomRatesMap.get(record.accountId); // Corrected variable name here
             }
             const recordBalance = (record.totalTime / 60) * pricePerHour;
             processedData[recordDate].accounts[record.accountId].tasks[taskRecordKey].taskTotalBalance += recordBalance;
@@ -1475,7 +1481,7 @@ const renderTrackWorkPage = async () => {
                                 });
                             })
                             .join('\n'); // Join with newline for multi-line tooltip
-                        totalTimeCell.title = tooltipContent;
+                        totalTimeCell.title = taskSummaryTooltip;
 
 
                         // Column 8: Total for Task (per task record) - Now column 8
