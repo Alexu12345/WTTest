@@ -376,7 +376,7 @@ const translations = {
         'confirmDeleteRecord': 'هل أنت متأكد من حذف هذا السجل للمستخدم {name}؟',
         'recordDeletedSuccess': 'تم حذف السجل بنجاح.',
         'errorDeletingRecord': 'حدث خطأ أثناء حذف السجل.',
-        'editRecord': 'تعديل سجل العمل',
+        'editRecord': 'تعديل',
         'taskCountEdit': 'عدد المهام:',
         'totalTimeEdit': 'إجمالي الوقت (دقيقة):',
         'saveChangesBtn': 'حفظ التعديلات',
