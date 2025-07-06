@@ -413,7 +413,7 @@ const translations = {
         'unauthorizedAccess': 'وصول غير مصرح به. يرجى تسجيل الدخول كمسؤول.', // New
         'error': 'خطأ', // New translation for modal title
         'close': 'إغلاق', // New translation for modal button
-        'accountTotalTimeColumn': 'إجمالي وقت الحساب', // New
+        'accountTotalTimeColumnShort': 'وقت الحساب', // New shorter translation for the column
         'accountBalanceColumn': 'رصيد الحساب', // New
         'timeSinceLastClick': 'آخر نقرة منذ {minutes} دقيقة و {seconds} ثانية.' // New
     },
@@ -557,7 +557,7 @@ const translations = {
         'unauthorizedAccess': 'Unauthorized access. Please log in as an administrator.', // New
         'error': 'Error', // New translation for modal title
         'close': 'Close', // New translation for modal button
-        'accountTotalTimeColumn': 'Account Total Time', // New
+        'accountTotalTimeColumnShort': 'Account Time', // New shorter translation for the column
         'accountBalanceColumn': 'Account Balance', // New
         'timeSinceLastClick': 'Last click was {minutes} minutes and {seconds} seconds ago.' // New
     }
@@ -1023,9 +1023,14 @@ const renderTaskTimingButtons = () => {
                         seconds: formatNumberToEnglish(seconds)
                     });
                     timeMessageDiv.style.display = 'block';
+                    timeMessageDiv.classList.add('show'); // Add show class to trigger transition
                     // Hide message after 3 seconds
                     setTimeout(() => {
-                        timeMessageDiv.style.display = 'none';
+                        timeMessageDiv.classList.remove('show');
+                        timeMessageDiv.addEventListener('transitionend', function handler() {
+                            timeMessageDiv.style.display = 'none';
+                            timeMessageDiv.removeEventListener('transitionend', handler);
+                        }, { once: true });
                     }, 3000);
                 }
                 lastClickTime = now; // Update last click time
@@ -1537,7 +1542,7 @@ const renderTrackWorkPage = async () => {
                 grandTotalBalance += (record.totalTime / 60) * pricePerHour;
             }
         });
-        cell.textContent = `${getTranslatedText('totalBalanceOverall')}: ${formatNumberToEnglish(grandTotalBalance.toFixed(2))} ${getTranslatedText('currencyUnit')}`;
+        cell.textContent = `${formatNumberToEnglish(grandTotalBalance.toFixed(2))} ${getTranslatedText('currencyUnit')}`;
         cell.classList.add('grand-total-value');
 
         // Apply styling to grand total cells
@@ -1599,6 +1604,9 @@ const loadAndDisplayUsers = async () => {
             cell.style.textAlign = 'center';
         } else {
             allUsers.forEach(user => { // Iterate over cached users
+                // Skip rendering admin user in this table
+                if (user.id === 'admin') return;
+
                 console.log("Processing user for admin panel:", user.name); // Debug log for each user
                 const row = usersTableBody.insertRow();
                 row.insertCell().textContent = user.name;
@@ -1606,13 +1614,8 @@ const loadAndDisplayUsers = async () => {
                 const actionCell = row.insertCell();
                 const deleteBtn = document.createElement('button');
                 deleteBtn.textContent = getTranslatedText('deleteBtn');
-                deleteBtn.classList.add('admin-action-btn', 'delete');
+                deleteBtn.classList.add('admin-action-btntp', 'delete'); // Use admin-action-btntp for consistency
                 deleteBtn.addEventListener('click', async () => {
-                    // Prevent deleting admin user from UI
-                    if (user.id === 'admin') { // Check if it's the admin user
-                        showToastMessage(getTranslatedText('notImplemented'), 'error'); // Or a specific message like 'Cannot delete admin user'
-                        return;
-                    }
                     if (confirm(getTranslatedText('confirmDeleteUser', { name: user.name }))) {
                         showLoadingIndicator(true);
                         try {
@@ -1695,7 +1698,7 @@ const loadAndDisplayAccounts = async () => {
                 const actionCell = row.insertCell();
                 const deleteBtn = document.createElement('button');
                 deleteBtn.textContent = getTranslatedText('deleteBtn');
-                deleteBtn.classList.add('admin-action-btn', 'delete');
+                deleteBtn.classList.add('admin-action-btntp', 'delete'); // Use admin-action-btntp for consistency
                 deleteBtn.addEventListener('click', async () => {
                     if (confirm(getTranslatedText('confirmDeleteAccount', { name: account.name }))) {
                         showLoadingIndicator(true);
@@ -1787,7 +1790,7 @@ const loadAndDisplayTaskDefinitions = async () => {
                 const actionCell = row.insertCell();
                 const deleteBtn = document.createElement('button');
                 deleteBtn.textContent = getTranslatedText('deleteBtn');
-                deleteBtn.classList.add('admin-action-btn', 'delete');
+                deleteBtn.classList.add('admin-action-btntp', 'delete'); // Use admin-action-btntp for consistency
                 deleteBtn.addEventListener('click', async () => {
                     if (confirm(getTranslatedText('confirmDeleteTask', { name: task.name }))) {
                         showLoadingIndicator(true);
@@ -1903,6 +1906,9 @@ const populateUserFilter = async () => {
     try {
         // Use cached allUsers data
         allUsers.forEach(user => { // Iterate over cached users
+            // Exclude admin from the user filter dropdown
+            if (user.id === 'admin') return;
+
             const option = document.createElement('option');
             option.value = user.id;
             option.textContent = user.name;
@@ -1960,13 +1966,13 @@ const loadAndDisplayWorkRecords = async (userId = null, date = null) => {
                 const actionCell = row.insertCell();
                 const editBtn = document.createElement('button');
                 editBtn.textContent = getTranslatedText('editRecord');
-                editBtn.classList.add('admin-action-btn');
+                editBtn.classList.add('admin-action-btntp'); // Use admin-action-btntp for consistency
                 editBtn.addEventListener('click', () => openEditRecordModal(record));
                 actionCell.appendChild(editBtn);
 
                 const deleteBtn = document.createElement('button');
                 deleteBtn.textContent = getTranslatedText('deleteBtn');
-                deleteBtn.classList.add('admin-action-btn', 'delete');
+                deleteBtn.classList.add('admin-action-btntp', 'delete'); // Use admin-action-btntp for consistency
                 deleteBtn.addEventListener('click', async () => {
                     if (confirm(getTranslatedText('confirmDeleteRecord', { name: record.userName }))) {
                         showLoadingIndicator(true);
@@ -2180,10 +2186,11 @@ const renderEmployeeRatesAndTotals = async () => {
                     modifyBtn.addEventListener('click', () => openEditEmployeeRateModal(user.id, user.name, account.id, account.name, defaultPrice, customPrice, customRateDocId));
                     actionsCell.appendChild(modifyBtn);
 
-                    // New: Account Total Time
+                    // New: Account Total Time (HH:MM:SS format with tooltip for minutes:seconds)
                     const accountTotalMinutes = userData.workedAccounts.get(account.id) || 0;
                     const accountTotalTimeCell = row.insertCell();
-                    accountTotalTimeCell.textContent = `${formatNumberToEnglish(formatMinutesToMMSS(accountTotalMinutes))} / ${formatNumberToEnglish(formatTotalMinutesToHHMMSS(accountTotalMinutes))}`;
+                    accountTotalTimeCell.textContent = formatNumberToEnglish(formatTotalMinutesToHHMMSS(accountTotalMinutes));
+                    accountTotalTimeCell.title = `${formatNumberToEnglish(accountTotalMinutes.toFixed(2))} ${getTranslatedText('minutesUnit')}`; // Tooltip with total minutes
 
                     // New: Account Balance
                     const accountBalanceCell = row.insertCell();
