@@ -233,6 +233,7 @@ button.disabled {
     color: white; /* Ensure numbers are white */
 }
 
+
 /* Dashboard Options (Start Work, Track Work buttons) */
 .dashboard-options {
     display: flex;
@@ -489,16 +490,18 @@ button.disabled {
     margin-bottom: 20px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
+    /* This ensures that the table itself does not overflow its container,
+       and the scrollbar appears for the container. */
 }
 
 .track-work-container table,
 .admin-section table {
-    width: 100%;
+    width: 100%; /* Make table take full width of its container */
     border-collapse: collapse; /* Changed to collapse for cleaner borders */
     background-color: #f8f9fa;
     border-radius: 8px;
-    overflow: hidden;
-    table-layout: auto;
+    overflow: hidden; /* Ensures rounded corners apply to table content */
+    table-layout: auto; /* Allows columns to size based on content, but can lead to overflow */
     transition: background-color 0.3s ease;
 }
 
@@ -522,7 +525,7 @@ button.disabled {
     background-color: #007bff;
     color: white;
     font-weight: 600;
-    position: sticky;
+    position: sticky; /* Keep headers visible when scrolling */
     top: 0;
     z-index: 1;
 }
@@ -673,8 +676,9 @@ button.disabled {
     max-width: 100px; /* Set a max-width to help with overflow */
 }
 
-.admin-action-btn {
-    background-color: #6c757d;
+/* Consolidated admin action button style */
+.admin-action-btntp {
+    background-color: #6c757d; /* Default color, similar to back-btn */
     color: white;
     padding: 4px 8px; /* Further reduced padding for smaller button */
     border-radius: 5px;
@@ -683,36 +687,27 @@ button.disabled {
     margin: 2px; /* Reduced margin */
     display: inline-block;
     white-space: nowrap;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle shadow */
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.admin-action-btn:hover {
+.admin-action-btntp:hover {
     background-color: #5a6268;
+    transform: translateY(-1px);
 }
 
-.admin-action-btn.delete {
+.admin-action-btntp.delete {
     background-color: #dc3545;
 }
 
-.admin-action-btn.delete:hover {
+.admin-action-btntp.delete:hover {
     background-color: #c82333;
 }
 
-/* Specific style for the "Modify" button in employee rates table */
-.admin-action-btntp {
+.admin-action-btntp.primary { /* For the modify button specifically */
     background-color: #e0a800 !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 5px !important;
-    cursor: pointer !important;
-    font-size: 10px !important; /* Smallest font size */
-    padding: 4px 8px !important; /* Smallest padding */
-    transition: background-color 0.3s ease !important;
-    margin-bottom: 0 !important;
-    width: auto !important; /* Allow width to adjust to content */
-    white-space: nowrap; /* Prevent text wrapping */
-    align-self: flex-start !important;
 }
-.admin-action-btntp:hover {
+.admin-action-btntp.primary:hover {
     background-color: #c79100 !important;
 }
 
