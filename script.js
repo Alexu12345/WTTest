@@ -114,7 +114,8 @@ const accountsTableBody = document.getElementById('accountsTableBody');
 
 // Manage Tasks
 const newTaskNameInput = document.getElementById('newTaskNameInput');
-const newTaskNameInputError = document = document.getElementById('newTaskNameInputError');
+// Corrected typo here: removed "document ="
+const newTaskNameInputError = document.getElementById('newTaskNameInputError');
 const newTimingsContainer = document.getElementById('newTimingsContainer');
 const newTimingsInputError = document.getElementById('newTimingsInputError');
 const addTimingFieldBtn = document.getElementById('addTimingFieldBtn');
