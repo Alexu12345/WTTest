@@ -136,6 +136,7 @@ const loadAllRecordsBtn = document.getElementById('loadAllRecordsBtn');
 
 // Modals
 const editRecordModal = document.getElementById('editRecordModal');
+const closeEditRecordModalBtn = editRecordModal.querySelector('.close-button');
 const editAccountSelect = document.getElementById('editAccountSelect');
 const editAccountSelectError = document.getElementById('editAccountSelectError');
 const editTaskTypeSelect = document.getElementById('editTaskTypeSelect');
@@ -348,7 +349,9 @@ const languageTexts = {
         tasksAt: "مهمات بـ",
         minutes: "دقائق",
         hours: "ساعات",
-        seconds: "ثواني"
+        seconds: "ثواني",
+        unknownTask: "مهمة غير معروفة",
+        totalDailyHoursLabel: "الإجمالي الكلي" // Reusing for grand total
     },
     en: {
         loginTitle: "Login",
@@ -513,7 +516,9 @@ const languageTexts = {
         tasksAt: "tasks at",
         minutes: "minutes",
         hours: "hours",
-        seconds: "seconds"
+        seconds: "seconds",
+        unknownTask: "Unknown Task",
+        totalDailyHoursLabel: "Grand Total" // Reusing for grand total
     }
 };
 
@@ -532,6 +537,7 @@ function setLanguage(lang) {
             populateAccountSelect();
             populateTaskTypeSelect();
             updateWorkSummary(); // Re-render summary with new language
+            updateSessionTimePopup(); // Update session time popup with new language
         }
         if (document.getElementById('trackWorkPage').classList.contains('active')) {
             renderTrackWorkTable();
@@ -1439,7 +1445,7 @@ async function startWork() {
 
     // Start updating session time popup
     if (sessionTimerInterval) clearInterval(sessionTimerInterval);
-    sessionTimerInterval = setInterval(updateWorkSummary, 1000); // Update every second
+    sessionTimerInterval = setInterval(updateSessionTimePopup, 1000); // Update every second
 
     // Render task timing buttons
     renderTaskTimingButtons();
@@ -1639,6 +1645,8 @@ function renderTaskTimingButtons() {
     }
 }
 
+let currentDetailedSummary = {}; // To store the detailed summary for the session popup
+
 async function updateWorkSummary() {
     if (!loggedInUser) return;
 
@@ -1679,28 +1687,16 @@ async function updateWorkSummary() {
         if (completedTasksCount) completedTasksCount.textContent = totalCompletedTasks;
         if (recordedTotalTime) recordedTotalTime.textContent = formatDuration(totalRecordedTime);
 
-        // Update Session Time Popup
-        if (sessionTimePopup && workStartTime) {
-            const now = Date.now();
-            const totalSessionTimeMs = now - workStartTime;
-            const netSessionTimeMs = totalRecordedTime;
-            const delayMs = Math.max(0, totalSessionTimeMs - netSessionTimeMs);
+        // Store for session popup
+        currentDetailedSummary = detailedSummary;
 
-            sessionStartTimeDisplay.textContent = new Date(workStartTime).toLocaleTimeString(currentLanguage === 'ar' ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            popupTotalSessionTime.textContent = formatMillisecondsToHMS(totalSessionTimeMs);
-            netSessionTimeDisplay.textContent = formatMillisecondsToHMS(netSessionTimeMs);
-            delayDurationDisplay.textContent = formatMillisecondsToHMS(delayMs);
-            delayDurationDisplay.title = `${Math.floor(delayMs / (1000 * 60 * 60))} ${getTranslatedText('hours')}, ${Math.floor((delayMs % (1000 * 60 * 60)) / (1000 * 60))} ${getTranslatedText('minutes')}, ${Math.floor((delayMs % (1000 * 60)) / 1000)} ${getTranslatedText('seconds')}`;
-
-
-            // Render dynamic task details in popup
-            if (dynamicTaskDetails) {
-                dynamicTaskDetails.innerHTML = '';
-                for (const taskName in detailedSummary) {
-                    const p = document.createElement('p');
-                    p.textContent = `${detailedSummary[taskName].count} ${getTranslatedText('tasksAt')} ${formatDuration(detailedSummary[taskName].totalDuration)}`;
-                    dynamicTaskDetails.appendChild(p);
-                }
+        // Render detailed summary in the main container (if needed, otherwise remove this block)
+        if (detailedSummaryContainer) {
+            detailedSummaryContainer.innerHTML = '';
+            for (const taskName in detailedSummary) {
+                const p = document.createElement('p');
+                p.textContent = `${taskName}: ${detailedSummary[taskName].count} ${getTranslatedText('tasksCompleted')} - ${formatDuration(detailedSummary[taskName].totalDuration)}`;
+                detailedSummaryContainer.appendChild(p);
             }
         }
 
@@ -1709,6 +1705,40 @@ async function updateWorkSummary() {
         showToastMessage(getTranslatedText('errorFetchingData'), 'error');
     } finally {
         hideLoadingIndicator();
+    }
+}
+
+// New function to update the session time popup
+function updateSessionTimePopup() {
+    if (!loggedInUser || !workStartTime || !sessionTimePopup) {
+        // If no user, no session start time, or popup element not found, do nothing.
+        return;
+    }
+
+    const now = Date.now();
+    const totalSessionTimeMs = now - workStartTime;
+    const netSessionTimeMs = Object.values(currentDetailedSummary).reduce((sum, task) => sum + task.totalDuration, 0);
+    const delayMs = Math.max(0, totalSessionTimeMs - netSessionTimeMs);
+
+    // Update basic session details
+    if (sessionStartTimeDisplay) sessionStartTimeDisplay.textContent = new Date(workStartTime).toLocaleTimeString(currentLanguage === 'ar' ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    if (popupTotalSessionTime) popupTotalSessionTime.textContent = formatMillisecondsToHMS(totalSessionTimeMs);
+    if (netSessionTimeDisplay) netSessionTimeDisplay.textContent = formatMillisecondsToHMS(netSessionTimeMs);
+    
+    if (delayDurationDisplay) {
+        delayDurationDisplay.textContent = formatMillisecondsToHMS(delayMs);
+        // Set title attribute for detailed delay tooltip
+        delayDurationDisplay.title = `${Math.floor(delayMs / (1000 * 60 * 60))} ${getTranslatedText('hours')}, ${Math.floor((delayMs % (1000 * 60 * 60)) / (1000 * 60))} ${getTranslatedText('minutes')}, ${Math.floor((delayMs % (1000 * 60)) / 1000)} ${getTranslatedText('seconds')}`;
+    }
+
+    // Update dynamic task details in popup
+    if (dynamicTaskDetails) {
+        dynamicTaskDetails.innerHTML = '';
+        for (const taskName in currentDetailedSummary) {
+            const p = document.createElement('p');
+            p.textContent = `${currentDetailedSummary[taskName].count} ${getTranslatedText('tasksAt')} ${formatDuration(currentDetailedSummary[taskName].totalDuration)}`;
+            dynamicTaskDetails.appendChild(p);
+        }
     }
 }
 
