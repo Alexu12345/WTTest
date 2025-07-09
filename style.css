@@ -1214,6 +1214,10 @@ body.dark-mode .time-since-last-click {
     color: #ECF0F1;
 }
 
+body.dark-mode .time-since-last-click.show {
+    opacity: 1;
+}
+
 body.dark-mode .total-hours-box {
     background-color: #2ECC71; /* Secondary green */
     border: 1px solid #27AE60;
