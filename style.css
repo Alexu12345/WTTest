@@ -345,6 +345,7 @@ button.disabled {
     box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.05);
     transition: background-color 0.3s ease, color 0.3s ease;
     width: 100%;
+    position: relative; /* Needed for absolute positioning of session-time-popup */
 }
 
 .work-summary-section table {
@@ -370,6 +371,74 @@ button.disabled {
     font-weight: bold;
     color: #2ECC71; /* Secondary green for time */
     font-size: 22px;
+    cursor: pointer; /* Indicate it's clickable/hoverable */
+    position: relative; /* For positioning the popup relative to this cell */
+}
+
+/* Session Time Popup Styles */
+.session-time-popup {
+    position: absolute;
+    top: 100%; /* Position below the "Total Time Recorded" cell */
+    right: 0; /* Align to the right of the parent */
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    padding: 15px 20px;
+    z-index: 100;
+    min-width: 250px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px); /* Start slightly below */
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out, visibility 0.3s ease-out;
+    text-align: right; /* Align text to the right for RTL */
+    color: #333;
+}
+
+.session-time-popup.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.session-time-popup h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #3498DB; /* Primary blue for popup title */
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    font-size: 18px;
+}
+
+.session-time-popup p {
+    margin: 8px 0;
+    font-size: 15px;
+    color: #555;
+    display: flex;
+    justify-content: space-between; /* Align labels and values */
+    gap: 10px;
+}
+
+.session-time-popup p span {
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.session-time-popup #delayDuration {
+    font-weight: bold;
+    color: #E74C3C; /* Red for delay */
+}
+
+.session-time-popup #dynamicTaskDetails {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px dashed #eee;
+}
+
+.session-time-popup #dynamicTaskDetails p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #666;
 }
 
 /* Styling for detailedSummaryContainer */
@@ -732,7 +801,7 @@ button.disabled {
 }
 
 .admin-action-btntp.primary { /* For the modify button specifically */
-    background-color: #F39C12 !important; /* Accent yellow/orange */
+    background-color: #F39C12 !important; /* Accent orange/yellow */
 }
 .admin-action-btntp.primary:hover {
     background-color: #E67E22 !important;
@@ -1070,7 +1139,8 @@ body.dark-mode .modal-content,
 body.dark-mode .popup,
 body.dark-mode .admin-section,
 body.dark-mode .work-summary-section,
-body.dark-mode .task-timing-buttons-section {
+body.dark-mode .task-timing-buttons-section,
+body.dark-mode .session-time-popup { /* Added for dark mode session popup */
     background-color: #2C3E50; /* Darker blue/gray for elements */
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     border-color: #4A6070; /* Darker border */
@@ -1079,13 +1149,16 @@ body.dark-mode .task-timing-buttons-section {
 
 body.dark-mode h1,
 body.dark-mode h2,
-body.dark-mode h3 {
+body.dark-mode h3,
+body.dark-mode .session-time-popup h4 { /* Added for dark mode session popup title */
     color: #76D7C4; /* Soft teal for headings */
     text-shadow: 0 0 5px rgba(118, 215, 196, 0.3);
 }
 
 body.dark-mode .input-group label,
-body.dark-mode .modal-content label {
+body.dark-mode .modal-content label,
+body.dark-mode .session-time-popup p, /* Added for dark mode session popup text */
+body.dark-mode .session-time-popup p span { /* Added for dark mode session popup span text */
     color: #E0E0E0; /* Slightly brighter for labels */
 }
 
@@ -1395,5 +1468,14 @@ body.dark-mode .admin-action-btntp.primary:hover {
     .admin-action-btn, .admin-action-btntp {
         font-size: 9px !important; /* Very small for mobile buttons */
         padding: 3px 6px !important;
+    }
+    /* Adjust session time popup for smaller screens */
+    .session-time-popup {
+        min-width: unset;
+        width: 95%; /* Take more width on small screens */
+        left: 50%;
+        transform: translateX(-50%);
+        top: auto; /* Let it position normally */
+        bottom: 10px; /* Position at the bottom of the work-summary-section */
     }
 }
