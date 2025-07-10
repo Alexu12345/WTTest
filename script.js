@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, doc, collection, getDocs, setDoc, updateDoc, deleteDoc, query, where, limit, Timestamp, serverTimestamp, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getFirestore, doc, collection, getDocs, setDoc, updateDoc, deleteDoc, query, where, limit, Timestamp, serverTimestamp, addDoc, orderBy, onSnapshot, startAfter } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { documentId } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; // Import documentId
 
 // Your web app's Firebase configuration
@@ -114,7 +114,8 @@ const accountsTableBody = document.getElementById('accountsTableBody');
 
 // Manage Tasks
 const newTaskNameInput = document.getElementById('newTaskNameInput');
-const newTaskNameInputError = document.getElementById('newTaskNameInputError'); // Corrected typo
+// Corrected typo here: removed "document ="
+const newTaskNameInputError = document.getElementById('newTaskNameInputError');
 const newTimingsContainer = document.getElementById('newTimingsContainer');
 const newTimingsInputError = document.getElementById('newTimingsInputError');
 const addTimingFieldBtn = document.getElementById('addTimingFieldBtn');
@@ -1472,7 +1473,7 @@ async function saveWork() {
             userId: loggedInUser.id,
             accountId: workingOnAccountId,
             taskId: workingOnTaskId,
-            duration: timingValueMs, // Save the timing value as duration in milliseconds
+            duration: timingValueMs, // Use the pre-defined timing duration
             tasksCompleted: 1, // Always 1 task completed per button click
             timestamp: Date.now(),
             date: dateString
@@ -2400,13 +2401,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     pinInputs.forEach((input, index) => {
         input.addEventListener('input', () => {
             clearInputError(input, pinInputError);
-            if (input.value.length === 1) {
-                if (index < pinInputs.length - 1) {
-                    pinInputs[index + 1].focus();
-                } else {
-                    // This is the last input, trigger login automatically
-                    login();
-                }
+            if (input.value.length === 1 && index < pinInputs.length - 1) {
+                pinInputs[index + 1].focus();
             }
         });
         input.addEventListener('keydown', (e) => {
@@ -2418,7 +2414,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 if (loginBtn) loginBtn.addEventListener('click', login);
-// Keep the Enter key listener as a fallback, though automatic login should handle most cases
+// Listen for Enter key on the last PIN input field
 if (pinInputs[pinInputs.length - 1]) {
     pinInputs[pinInputs.length - 1].addEventListener('keypress', (e) => {
         if (e.key === 'Enter') login();
