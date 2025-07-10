@@ -219,7 +219,10 @@ const showPage = (pageElement) => {
     editEmployeeRateModal.style.display = 'none'; // Ensure new modal is hidden
     loginErrorModal.style.display = 'none'; // Ensure login error modal is hidden
     confirmationModal.style.display = 'none'; // Ensure confirmation modal is hidden
-    sessionDetailsPopup.style.display = 'none'; // Ensure session details popup is hidden
+    // Add a null check for sessionDetailsPopup to prevent errors if it's not yet loaded
+    if (sessionDetailsPopup) {
+        sessionDetailsPopup.style.display = 'none'; // Ensure session details popup is hidden
+    }
 };
 
 // Function to show toast messages (notifications)
@@ -3188,11 +3191,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const userDocSnap = await getDoc(userDocRef);
                 const userData = userDocSnap.exists() ? userDocSnap.data() : {};
                 updateSessionDetailsPopup(userData);
-                sessionDetailsPopup.style.display = 'flex'; // Show the popup
+                // Add a null check before accessing style property
+                if (sessionDetailsPopup) {
+                    sessionDetailsPopup.style.display = 'flex'; // Show the popup
+                }
             }
         });
         totalHoursBox.addEventListener('mouseleave', () => {
-            sessionDetailsPopup.style.display = 'none'; // Hide the popup
+            // Add a null check before accessing style property
+            if (sessionDetailsPopup) {
+                sessionDetailsPopup.style.display = 'none'; // Hide the popup
+            }
         });
     }
 
