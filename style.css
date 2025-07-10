@@ -24,6 +24,131 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for dark mode */
 }
 
+/* Dark Mode Styles */
+body.dark-mode {
+    background-color: #2c3e50; /* Dark mode background */
+    color: #ecf0f1; /* Dark mode text color */
+}
+
+body.dark-mode .page {
+    background-color: #34495e; /* Darker background for pages */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .summary-box,
+body.dark-mode .dashboard-options button,
+body.dark-mode .admin-section button,
+body.dark-mode .modal-content,
+body.dark-mode .task-selection-popup,
+body.dark-mode .task-timing-btn {
+    background-color: #4a627a; /* Darker shade for elements */
+    color: #ecf0f1;
+    border: 1px solid #5a738c;
+}
+
+body.dark-mode .summary-box span,
+body.dark-mode .dashboard-options button span,
+body.dark-mode .admin-section button span,
+body.dark-mode .modal-content span,
+body.dark-mode .task-selection-popup span,
+body.dark-mode .task-timing-btn span {
+    color: #ecf0f1; /* Ensure text is readable */
+}
+
+body.dark-mode .summary-box:hover {
+    background-color: #5a738c;
+}
+
+body.dark-mode input[type="text"],
+body.dark-mode input[type="number"],
+body.dark-mode input[type="password"],
+body.dark-mode input[type="date"],
+body.dark-mode input[type="time"],
+body.dark-mode select,
+body.dark-mode textarea {
+    background-color: #5a738c;
+    color: #ecf0f1;
+    border: 1px solid #6a849d;
+}
+
+body.dark-mode input[type="text"]::placeholder,
+body.dark-mode input[type="number"]::placeholder,
+body.dark-mode input[type="password"]::placeholder,
+body.dark-mode input[type="date"]::placeholder,
+body.dark-mode input[type="time"]::placeholder,
+body.dark-mode select::placeholder,
+body.dark-mode textarea::placeholder {
+    color: #b0bec5;
+}
+
+body.dark-mode table th,
+body.dark-mode table td {
+    border-color: #5a738c;
+}
+
+body.dark-mode table thead {
+    background-color: #4a627a;
+}
+
+body.dark-mode .admin-action-btntp {
+    background-color: #5a738c;
+    color: #ecf0f1;
+}
+
+body.dark-mode .admin-action-btntp.delete {
+    background-color: #e74c3c;
+}
+
+body.dark-mode .admin-action-btntp:hover {
+    background-color: #6a849d;
+}
+
+body.dark-mode .admin-action-btntp.delete:hover {
+    background-color: #c0392b;
+}
+
+body.dark-mode .lang-btn {
+    background-color: #5a738c;
+    color: #ecf0f1;
+}
+
+body.dark-mode .lang-btn.active {
+    background-color: #76D7C4; /* Soft teal */
+    color: #2c3e50;
+}
+
+body.dark-mode .dark-mode-toggle {
+    background-color: #5a738c;
+    color: #ecf0f1;
+}
+
+body.dark-mode .dark-mode-toggle:hover {
+    background-color: #6a849d;
+}
+
+body.dark-mode .toast-message.success {
+    background-color: #2ECC71;
+    color: #fff;
+}
+
+body.dark-mode .toast-message.error {
+    background-color: #E74C3C;
+    color: #fff;
+}
+
+body.dark-mode .loading-indicator .spinner {
+    border-top-color: #76D7C4;
+}
+
+body.dark-mode .modal-buttons button.secondary {
+    background-color: #5a738c;
+    color: #ecf0f1;
+}
+
+body.dark-mode .modal-buttons button.secondary:hover {
+    background-color: #6a849d;
+}
+
 /* Page Containers - General styling */
 .page {
     background-color: #ffffff; /* Light mode page background */
@@ -31,475 +156,403 @@ body {
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 550px; /* Default max-width for most pages */
-    margin: 20px auto; /* Center the page horizontally */
-    box-sizing: border-box;
-    display: flex; /* Ensure flex for internal layout */
-    flex-direction: column; /* Stack content vertically within each page */
-    align-items: center; /* Center content horizontally within the page */
-    gap: 20px; /* Add vertical gap between direct children of .page */
-}
-
-h1, h2, h3 {
-    color: #2c3e50; /* Light mode heading color */
-    text-align: center;
-    margin-bottom: 30px;
-    font-weight: 600;
-    transition: color 0.3s ease;
-    width: 100%; /* Ensure headings take full width */
-}
-
-/* Input Group Styles */
-.input-group {
-    margin-bottom: 15px;
-    width: 100%;
+    max-width: 900px; /* Max width for larger screens */
+    margin-top: 20px; /* Space from top for header elements */
+    margin-bottom: 20px; /* Space from bottom */
     display: flex;
     flex-direction: column;
-    align-items: flex-end; /* Align labels/inputs to the right in RTL */
+    gap: 25px;
 }
 
-.input-group label {
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #555; /* Light mode label color */
-    transition: color 0.3s ease;
+/* Login Page Specific Styling */
+.login-page {
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh; /* Center vertically on page */
+    text-align: center;
 }
 
-.input-group input[type="text"],
-.input-group input[type="password"],
-.input-group input[type="number"],
-.input-group input[type="date"],
-.input-group input[type="time"],
-.input-group select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ced4da; /* Light mode input border */
-    border-radius: 8px;
-    font-size: 16px;
-    box-sizing: border-box;
-    margin-top: 5px;
-    color: #333; /* Light mode input text color */
-    background-color: #f8f9fa; /* Light mode input background */
-    transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
-}
-
-.input-group input:focus,
-.input-group select:focus {
-    border-color: #3498DB; /* Primary blue focus */
-    outline: none;
-    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25); /* Primary blue shadow */
-}
-
-/* Input validation feedback */
-.input-group input.is-invalid,
-.input-group select.is-invalid {
-    border-color: #E74C3C; /* Red for invalid */
-    box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
-}
-
-.input-error-message {
-    color: #E74C3C; /* Red for error messages */
-    font-size: 12px;
-    margin-top: 5px;
-    text-align: right;
-    width: 100%;
-    display: none; /* Hidden by default, shown by JS */
-}
-.input-error-message.show {
-    display: block;
-}
-
-
-/* General Button Styles */
-button {
-    background-color: #3498DB; /* Primary blue button */
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 17px;
-    width: 100%; /* Full width for general buttons */
-    margin-top: 15px;
-    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-button:hover {
-    background-color: #2980B9; /* Darker primary blue on hover */
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-/* Disabled button style */
-button:disabled,
-button.disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    background-color: #cccccc !important;
-    transform: none !important;
-    box-shadow: none !important;
-}
-
-/* Login Page Styles */
 .login-container {
-    max-width: 450px;
-    padding: 50px;
+    background-color: #f8f9fa;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 400px; /* Max width for login form */
 }
 
-.login-container h1 {
-    font-size: 32px;
-    color: #3498DB; /* Primary blue for login title */
+body.dark-mode .login-container {
+    background-color: #4a627a; /* Darker background for login container */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* PIN Input Fields Styling */
-.pin-input-group {
+/* PIN Input Styling */
+.pin-input-container {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 25px;
+    gap: 10px; /* Space between PIN input fields */
+    margin-bottom: 20px;
+    /* Removed flex-wrap: wrap; here to prevent wrapping on smaller screens */
 }
 
-.pin-input-field {
-    width: 45px;
-    height: 60px;
-    font-size: 2.5em;
+.pin-input-container input[type="password"] {
+    width: 45px; /* Fixed width for each PIN digit */
+    height: 45px; /* Fixed height */
     text-align: center;
-    border: 2px solid #ced4da;
+    font-size: 24px; /* Larger font size for digits */
+    border: 2px solid #ccc;
     border-radius: 8px;
-    background-color: #f8f9fa;
+    background-color: #fff;
     color: #333;
-    transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
-    box-sizing: border-box;
-    -moz-appearance: textfield;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    -moz-appearance: textfield; /* Hide arrows in Firefox */
 }
-.pin-input-field::-webkit-outer-spin-button,
-.pin-input-field::-webkit-inner-spin-button {
+
+.pin-input-container input[type="password"]::-webkit-outer-spin-button,
+.pin-input-container input[type="password"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
-.pin-input-field:focus {
-    border-color: #3498DB; /* Primary blue focus */
+
+body.dark-mode .pin-input-container input[type="password"] {
+    background-color: #5a738c;
+    color: #ecf0f1;
+    border-color: #6a849d;
+}
+
+.pin-input-container input[type="password"]:focus {
+    border-color: #007bff; /* Highlight on focus */
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
     outline: none;
-    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
 }
 
-
-/* Main Dashboard Styles */
-.main-dashboard-container {
-    max-width: 800px;
-    padding: 40px;
+.pin-input-container input[type="password"].is-invalid {
+    border-color: #dc3545; /* Red border for invalid input */
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25);
 }
 
-.header-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 40px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #eee;
-    flex-wrap: wrap;
-    gap: 15px;
-    width: 100%;
-    position: relative; /* For positioning the popup */
-}
-
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
-    flex-grow: 1;
-}
-
-.user-avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #3498DB; /* Primary blue border */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin-left: 15px; /* Adjust for RTL */
-}
-
-.user-info p {
-    font-size: 20px;
-    font-weight: 500;
-    margin: 0;
-    flex-shrink: 0;
-}
-
-.total-hours-box {
-    background-color: #2ECC71; /* Secondary green */
-    color: white;
-    padding: 15px 25px;
-    border-radius: 10px;
-    text-align: center;
-    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3); /* Green shadow */
-    min-width: 180px;
+/* General Input Group Styling */
+.input-group {
     display: flex;
     flex-direction: column;
-    align-items: flex-end; /* Align text to the right in RTL */
-    gap: 5px;
-    font-size: 18px;
-    font-weight: 600;
-    cursor: pointer; /* Indicate it's clickable/hoverable */
-    position: relative; /* For positioning the popup */
+    gap: 8px;
+    margin-bottom: 15px;
 }
 
-.total-hours-box p {
-    margin: 0;
-    font-weight: normal;
-    color: white;
+.input-group label {
+    font-weight: bold;
+    color: #555;
     transition: color 0.3s ease;
 }
-.total-hours-box p span {
-    font-weight: bold;
-    color: white;
+
+body.dark-mode .input-group label {
+    color: #ecf0f1;
 }
 
-/* Session Details Popup Styles */
-.session-details-popup {
-    position: absolute;
-    top: 100%; /* Position below the total-hours-box */
-    right: 0; /* Align to the right of the total-hours-box */
-    background-color: #ffffff;
+.input-group input[type="text"],
+.input-group input[type="number"],
+.input-group input[type="password"],
+.input-group input[type="date"],
+.input-group input[type="time"],
+.input-group select,
+.input-group textarea {
+    padding: 12px;
     border: 1px solid #ddd;
     border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    font-size: 16px;
+    width: 100%;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-group input[type="text"]:focus,
+.input-group input[type="number"]:focus,
+.input-group input[type="password"]:focus,
+.input-group input[type="date"]:focus,
+.input-group input[type="time"]:focus,
+.input-group select:focus,
+.input-group textarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+.input-group input.is-invalid,
+.input-group select.is-invalid,
+.input-group textarea.is-invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25);
+}
+
+.input-error-message {
+    color: #dc3545;
+    font-size: 0.85em;
+    margin-top: 5px;
+    display: none; /* Hidden by default */
+    text-align: right; /* Align right for RTL */
+}
+
+.input-error-message.show {
+    display: block; /* Show when 'show' class is added */
+}
+
+/* Buttons General Styling */
+button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: #007bff; /* Primary blue */
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease, opacity 0.3s ease;
+    align-self: flex-start; /* Default alignment */
+}
+
+button:hover:not(:disabled) {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+button.secondary {
+    background-color: #6c757d; /* Secondary gray */
+}
+
+button.secondary:hover:not(:disabled) {
+    background-color: #5a6268;
+}
+
+button.delete {
+    background-color: #dc3545; /* Red for delete actions */
+}
+
+button.delete:hover:not(:disabled) {
+    background-color: #c82333;
+}
+
+/* Main Dashboard Styling */
+.main-dashboard {
+    text-align: center;
+    align-items: center;
+}
+
+.dashboard-summary {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+    flex-wrap: wrap; /* Allow wrapping for responsiveness */
+}
+
+.summary-box {
+    background-color: #e9ecef;
     padding: 20px;
-    min-width: 300px;
-    z-index: 100;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+    border-radius: 10px;
+    flex: 1;
+    min-width: 200px; /* Minimum width for summary boxes */
+    max-width: 300px; /* Max width for summary boxes */
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    text-align: right;
-    margin-top: 10px; /* Space between box and popup */
-}
-
-.total-hours-box:hover .session-details-popup {
-    opacity: 1;
-    visibility: visible;
-}
-
-body.dark-mode .session-details-popup {
-    background-color: #2C3E50;
-    border-color: #4A6070;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-}
-
-.session-details-popup .basic-info-section,
-.session-details-popup .variable-info-section {
-    padding-bottom: 15px;
-    border-bottom: 1px solid #eee;
-}
-
-body.dark-mode .session-details-popup .basic-info-section,
-body.dark-mode .session-details-popup .variable-info-section {
-    border-bottom-color: #4A6070;
-}
-
-.session-details-popup .variable-info-section {
-    border-bottom: none; /* Last section doesn't need border */
-}
-
-.session-details-popup p {
-    margin: 5px 0;
-    font-size: 15px;
-    color: #555;
-}
-
-body.dark-mode .session-details-popup p {
-    color: #F8F9FA;
-}
-
-.session-details-popup p span {
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1em;
     font-weight: bold;
+    color: #495057;
+    position: relative; /* For popup positioning */
+    transition: background-color 0.3s ease;
+}
+
+.summary-box:hover {
+    background-color: #e0e4e8;
+}
+
+/* Session Details Popup */
+.session-details-popup {
+    position: absolute;
+    top: 100%; /* Position below the summary box */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    gap: 8px;
+    min-width: 250px;
+    text-align: right; /* Ensure RTL for content */
+    font-size: 0.9em;
     color: #333;
 }
 
-body.dark-mode .session-details-popup p span {
-    color: #76D7C4;
+body.dark-mode .session-details-popup {
+    background-color: #4a627a;
+    border-color: #5a738c;
+    color: #ecf0f1;
 }
 
 .session-details-popup h4 {
     margin-top: 0;
     margin-bottom: 10px;
-    color: #3498DB;
-    text-align: right;
-    font-size: 16px;
+    color: #007bff;
+    text-align: center;
 }
 
 body.dark-mode .session-details-popup h4 {
     color: #76D7C4;
 }
 
-.session-details-popup .delay-amount-text {
-    color: #E74C3C; /* Red for delay */
-    font-weight: bold;
-}
-
-body.dark-mode .session-details-popup .delay-amount-text {
-    color: #E74C3C;
-}
-
-
-/* Dashboard Options (Start Work, Track Work buttons) */
-.dashboard-options {
+.session-details-popup p {
+    margin: 0;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 30px;
-    width: 100%;
-    margin-top: 50px;
+    justify-content: space-between;
+    gap: 10px;
 }
 
-.big-option-btn {
-    background-color: #3498DB; /* Primary blue */
-    padding: 40px 30px;
-    font-size: 28px;
+.session-details-popup p span:first-child {
     font-weight: bold;
-    border-radius: 15px;
-    flex-grow: 1;
-    min-width: 250px;
-    max-width: 350px;
-    text-align: center;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-    margin-top: 0;
 }
 
-.big-option-btn:hover {
-    background-color: #2980B9; /* Darker primary blue on hover */
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-}
-
-#trackWorkOption {
-    background-color: #2C3E50; /* Darker blue/gray for contrast */
-}
-#trackWorkOption:hover {
-    background-color: #1A242F;
-}
-#adminPanelOption {
-    background-color: #F39C12; /* Accent orange/yellow */
-}
-#adminPanelOption:hover {
-    background-color: #E67E22;
-}
-
-
-/* Start Work Page */
-.popup {
-    background-color: #ffffff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1000;
-    width: 90%;
-    max-width: 450px;
-    text-align: center;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+.dashboard-options {
     display: flex;
     flex-direction: column;
     gap: 15px;
-}
-
-.popup h2 {
-    margin-bottom: 25px;
-    color: #3498DB; /* Primary blue */
-}
-
-.popup button {
-    margin: 5px;
-    width: auto;
-    flex-grow: 1;
-}
-.popup button.secondary {
-    background-color: #95A5A6; /* Soft gray for secondary action */
-}
-
-.popup button.secondary:hover {
-    background-color: #7F8C8D;
-}
-
-.work-summary-section {
-    margin-bottom: 30px;
-    background-color: #ECF0F1; /* Light gray background */
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.05);
-    transition: background-color 0.3s ease, color 0.3s ease;
     width: 100%;
+    max-width: 400px; /* Limit width of option buttons */
 }
 
-.work-summary-section table {
+.big-option-btn {
     width: 100%;
-    border-collapse: collapse;
+    padding: 15px 25px;
+    font-size: 1.2em;
+    background-color: #28a745; /* Green for start work */
 }
 
-.work-summary-section td {
-    padding: 12px;
-    font-size: 18px;
-    color: #495057;
-    border: none;
-    transition: color 0.3s ease;
+.big-option-btn:hover:not(:disabled) {
+    background-color: #218838;
 }
 
-.work-summary-section tr:first-child td:last-child {
+#trackWorkOption {
+    background-color: #17a2b8; /* Teal for track work */
+}
+
+#trackWorkOption:hover:not(:disabled) {
+    background-color: #138496;
+}
+
+#adminPanelOption {
+    background-color: #6f42c1; /* Purple for admin panel */
+}
+
+#adminPanelOption:hover:not(:disabled) {
+    background-color: #5a31a8;
+}
+
+.logout-btn {
+    background-color: #dc3545;
+    align-self: center; /* Center the logout button */
+    margin-top: 20px;
+}
+
+.logout-btn:hover:not(:disabled) {
+    background-color: #c82333;
+}
+
+
+/* Start Work Page Styling */
+.start-work-container {
+    align-items: center;
+    text-align: center;
+}
+
+.task-selection-popup {
+    background-color: #f8f9fa;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+}
+
+body.dark-mode .task-selection-popup {
+    background-color: #4a627a;
+}
+
+.work-summary {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.work-summary p {
+    font-size: 1.1em;
     font-weight: bold;
-    color: #3498DB; /* Primary blue for count */
-    font-size: 22px;
-}
-
-.work-summary-section tr:last-child td:last-child {
-    font-weight: bold;
-    color: #2ECC71; /* Secondary green for time */
-    font-size: 22px;
-}
-
-/* Styling for detailedSummaryContainer */
-#detailedSummaryContainer h3 {
-    font-size: 18px;
-    margin-top: 15px;
-    margin-bottom: 10px;
     color: #333;
-    text-align: right;
-    transition: color 0.3s ease;
-}
-#detailedSummaryContainer p {
-    font-size: 16px;
-    color: #555;
-    margin-bottom: 8px;
-    padding-bottom: 5px;
-    border-bottom: 1px dotted #e0e0e0;
-    text-align: right;
-    transition: color 0.3s ease, border-color 0.3s ease;
-}
-#detailedSummaryContainer p:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
+    margin: 5px 0;
+    flex-basis: 48%; /* Adjust for two columns */
+    text-align: center;
 }
 
+body.dark-mode .work-summary p {
+    color: #ecf0f1;
+}
+
+.detailed-summary-container {
+    background-color: #e9ecef;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    width: 100%;
+    text-align: right;
+    color: #495057;
+}
+
+body.dark-mode .detailed-summary-container {
+    background-color: #4a627a;
+    color: #ecf0f1;
+}
+
+.detailed-summary-container h3 {
+    margin-top: 0;
+    color: #007bff;
+    text-align: center;
+}
+
+body.dark-mode .detailed-summary-container h3 {
+    color: #76D7C4;
+}
+
+.detailed-summary-container p {
+    margin: 5px 0;
+}
 
 .task-timing-buttons-section {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     gap: 15px;
-    margin-bottom: 30px;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+    justify-content: center;
     width: 100%;
+    margin-bottom: 20px;
 }
 
 .timing-button-wrapper {
@@ -507,464 +560,430 @@ body.dark-mode .session-details-popup .delay-amount-text {
     flex-direction: column;
     align-items: center;
     gap: 5px;
-    flex-shrink: 0;
-    flex-basis: 120px;
-    min-height: 80px;
-    justify-content: flex-start;
-    position: relative;
+    position: relative; /* For positioning time-since-last-click */
 }
 
 .task-timing-btn {
-    background-color: #3498DB; /* Primary blue for task buttons */
-    display: inline-block;
-    width: 100%;
-    padding: 12px 10px;
-    margin: 0;
-    font-size: 16px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    padding: 15px 25px;
+    font-size: 1.1em;
+    background-color: #007bff;
+    min-width: 120px; /* Ensure buttons have a minimum width */
 }
 
 .task-timing-btn:hover {
-    background-color: #2980B9; /* Darker primary blue on hover */
+    background-color: #0056b3;
 }
 
 .undo-btn {
-    background-color: #F39C12; /* Accent yellow for undo */
+    background-color: #ffc107; /* Yellow for undo */
     color: #333;
-    padding: 0 15px;
-    border: none;
+    padding: 5px 10px;
+    font-size: 0.8em;
     border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: opacity 0.3s ease, height 0.3s ease, padding 0.3s ease, margin 0.3s ease;
-    width: fit-content;
+    display: none; /* Hidden by default, shown by JS */
     opacity: 0;
-    height: 0;
-    overflow: hidden;
-    pointer-events: none;
-    margin-top: 0;
-    z-index: 10;
-    white-space: nowrap;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: opacity 0.3s ease;
+    align-self: center;
+    width: fit-content;
 }
 
 .undo-btn.show {
     opacity: 1;
-    height: auto;
-    padding: 8px 15px;
-    pointer-events: auto;
-}
-
-.undo-btn:hover {
-    background-color: #E67E22; /* Darker accent yellow on hover */
 }
 
 .time-since-last-click {
     position: absolute;
-    top: -25px; /* Position above the button */
-    background-color: rgba(52, 152, 219, 0.7); /* Primary blue semi-transparent */
+    top: -30px; /* Position above the button */
+    background-color: rgba(0, 0, 0, 0.7);
     color: white;
-    padding: 5px 8px;
+    padding: 5px 10px;
     border-radius: 5px;
-    font-size: 12px;
+    font-size: 0.8em;
     white-space: nowrap;
-    z-index: 100;
+    z-index: 10;
     opacity: 0;
     transition: opacity 0.3s ease;
-    pointer-events: none; /* Do not block clicks */
 }
 
 .time-since-last-click.show {
     opacity: 1;
 }
 
-.save-work-btn {
-    background-color: #2ECC71; /* Secondary green for save */
-    margin-top: 30px;
+
+.start-work-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    width: 100%;
+    margin-top: 20px;
 }
 
-.save-work-btn:hover {
-    background-color: #27AE60; /* Darker secondary green on hover */
-}
-
-/* Track Work Page Styles */
+/* Track Work Page Styling */
 .track-work-container {
-    max-width: 1200px; /* Wider for detailed table */
-    padding: 40px;
-}
-/* Chart specific styles on track work page */
-#taskChart {
-    max-width: 400px;
-    max-height: 400px;
-    margin: 20px auto;
+    align-items: center;
 }
 
+.chart-container {
+    width: 100%;
+    max-width: 500px; /* Max width for the chart */
+    margin: 0 auto 30px auto; /* Center chart and add space below */
+    height: 300px; /* Fixed height for the chart */
+}
 
-/* Responsive table container */
 .table-responsive {
     width: 100%;
-    overflow-x: auto;
-    margin-top: 20px;
+    overflow-x: auto; /* Enable horizontal scrolling for tables on small screens */
     margin-bottom: 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-.track-work-container table,
-.admin-section table {
+table {
     width: 100%;
     border-collapse: collapse;
-    background-color: #f8f9fa; /* Light table background */
-    border-radius: 8px;
-    overflow: hidden;
-    table-layout: auto;
-    transition: background-color 0.3s ease;
+    min-width: 700px; /* Minimum width to prevent excessive squeezing */
 }
 
-.track-work-container table th,
-.track-work-container table td,
-.admin-section table th,
-.admin-section table td {
-    padding: 6px 8px;
+table th, table td {
+    padding: 12px 8px;
+    border: 1px solid #ddd;
     text-align: center;
-    border: 1px solid #dee2e6; /* Light table border */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 12px;
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-    vertical-align: middle;
+    white-space: nowrap; /* Prevent text wrapping in cells */
 }
 
-.track-work-container table th,
-.admin-section table th {
-    background-color: #3498DB; /* Primary blue for table headers */
+table thead {
+    background-color: #007bff;
     color: white;
-    font-weight: 600;
-    position: sticky;
-    top: 0;
-    z-index: 1;
 }
 
-.track-work-container table tbody tr:nth-child(even),
-.admin-section table tbody tr:nth-child(even) {
-    background-color: #ECF0F1; /* Light gray for even rows */
+body.dark-mode table thead {
+    background-color: #4a627a;
+    color: #ecf0f1;
 }
 
-.track-work-container table tbody tr:hover,
-.admin-section table tbody tr:hover {
-    background-color: #DDEBF0; /* Lighter blue on hover */
+table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+body.dark-mode table tbody tr:nth-child(even) {
+    background-color: #3e5066;
+}
+
+table tbody tr:hover {
+    background-color: #e9ecef;
+}
+
+body.dark-mode table tbody tr:hover {
+    background-color: #5a738c;
+}
+
+/* Specific styling for the daily record rows to add a bottom border for visual separation */
+.daily-record-row {
+    border-bottom: 2px solid #a7d9f7; /* Light blue border */
+}
+
+body.dark-mode .daily-record-row {
+    border-bottom: 2px solid #2a4158; /* Darker blue border for dark mode */
 }
 
 /* Styling for total cells in track work table */
-.track-work-container table .total-cell {
+.total-cell {
     font-weight: bold;
-    background-color: #E0F7FA; /* Light blue for total cells */
-    color: #2980B9; /* Darker primary blue */
-}
-/* Ensure date column does not wrap */
-.track-work-container table .date-cell {
-    white-space: nowrap;
-    min-width: 90px;
+    background-color: #e9f5fe; /* Light blue background for totals */
+    color: #0056b3; /* Darker blue text */
 }
 
-/* New: Border for daily record rows */
-.track-work-container table tbody .daily-record-row {
-    border-top: 2px solid #3498DB; /* Primary blue border */
-}
-.track-work-container table tbody tr:first-child.daily-record-row {
-    border-top: none;
+body.dark-mode .total-cell {
+    background-color: #34495e; /* Darker background for totals in dark mode */
+    color: #76D7C4; /* Soft teal text */
 }
 
-/* Styling for grand total footer */
-#trackTasksTableFoot td {
-    font-weight: bold;
-    background-color: #D1ECF1; /* Light cyan for footer */
-    border-top: 2px solid #3498DB; /* Primary blue border */
-    color: #2C3E50; /* Dark blue/gray */
+.date-cell {
+    background-color: #d0efff; /* Even lighter blue for date cells */
 }
-#trackTasksTableFoot .grand-total-label {
+
+body.dark-mode .date-cell {
+    background-color: #2a4158; /* Darker background for date cells in dark mode */
+}
+
+.daily-total-cell {
+    background-color: #a7d9f7; /* Slightly darker blue for daily total */
+}
+
+body.dark-mode .daily-total-cell {
+    background-color: #1e3347; /* Even darker background for daily total in dark mode */
+}
+
+/* Grand Total Footer Styling */
+tfoot .grand-total-footer-cell {
+    background-color: #0056b3; /* Darker blue for grand total footer */
+    color: white;
+    font-size: 1.1em;
+    padding: 15px 10px;
+    border-top: 3px solid #003366; /* Stronger border at the top */
+}
+
+body.dark-mode tfoot .grand-total-footer-cell {
+    background-color: #2c3e50; /* Darker background for grand total in dark mode */
+    color: #ecf0f1;
+    border-top: 3px solid #1a2b3c;
+}
+
+.grand-total-label {
     text-align: right;
 }
-#trackTasksTableFoot .grand-total-value {
-    text-align: center;
-}
 
-/* New class for footer cells to handle dark mode colors */
-.grand-total-footer-cell {
-    background-color: #ECF0F1; /* Light gray */
-    border-top: 2px solid #3498DB; /* Primary blue */
-    color: #2C3E50; /* Dark blue/gray */
+.grand-total-value {
+    text-align: left;
 }
 
 
-/* Admin Panel Styles */
+/* Admin Panel Styling */
 .admin-panel-container {
-    max-width: 900px;
-    padding: 40px;
-    text-align: right;
-}
-
-.admin-panel-container h1 {
-    color: #3498DB; /* Primary blue */
+    align-items: center;
 }
 
 .admin-section {
-    background-color: #f8f9fa; /* Light gray background */
+    background-color: #f8f9fa;
     padding: 25px;
     border-radius: 10px;
-    margin-bottom: 30px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
     width: 100%;
+    margin-bottom: 30px;
     display: flex;
     flex-direction: column;
     gap: 15px;
 }
 
-.admin-section h2 {
-    text-align: right;
-    margin-top: 0;
-    margin-bottom: 20px;
-    color: #3498DB; /* Primary blue */
-    border-bottom: 2px solid #e9ecef; /* Light gray border */
-    padding-bottom: 10px;
+body.dark-mode .admin-section {
+    background-color: #4a627a;
 }
 
 .admin-section h3 {
-    text-align: right;
-    margin-top: 25px;
-    margin-bottom: 15px;
+    text-align: center;
+    color: #007bff;
+    margin-bottom: 20px;
+}
+
+body.dark-mode .admin-section h3 {
+    color: #76D7C4;
+}
+
+.admin-section h4 {
+    margin-top: 20px;
+    margin-bottom: 10px;
     color: #555;
+    text-align: right;
 }
 
-.admin-section input[type="text"],
-.admin-section input[type="password"],
-.admin-section input[type="number"] {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border: 1px solid #ced4da;
-    border-radius: 5px;
-    font-size: 16px;
-    box-sizing: border-box;
+body.dark-mode .admin-section h4 {
+    color: #ecf0f1;
 }
 
-.admin-section button {
-    background-color: #2ECC71; /* Secondary green */
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-    margin-bottom: 0;
-    width: auto;
-    align-self: flex-start;
-}
-
-.admin-section button:hover {
-    background-color: #27AE60; /* Darker secondary green */
-}
-
-#addTimingFieldBtn {
-    background-color: #3498DB; /* Primary blue */
-}
-#addTimingFieldBtn:hover {
-    background-color: #2980B9;
-}
-#addTaskDefinitionBtn {
-    background-color: #8E44AD; /* Purple for contrast */
-}
-#addTaskDefinitionBtn:hover {
-    background-color: #7D3C98;
-}
-
-/* Admin table specific styling */
-.admin-section table th,
-.admin-section table td {
-    padding: 6px 8px;
-    font-size: 12px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100px;
-}
-
-/* Consolidated admin action button style */
 .admin-action-btntp {
-    background-color: #95A5A6; /* Soft gray for default actions */
-    color: white;
-    padding: 4px 8px;
-    border-radius: 5px;
-    font-size: 10px;
-    width: auto;
-    margin: 2px;
-    display: inline-block;
-    white-space: nowrap;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.admin-action-btntp:hover {
-    background-color: #7F8C8D;
-    transform: translateY(-1px);
+    padding: 8px 12px;
+    font-size: 0.9em;
+    margin-left: 5px; /* Space between buttons */
+    align-self: center; /* Center buttons within table cells */
+    min-width: 70px; /* Ensure buttons have a minimum width */
 }
 
 .admin-action-btntp.delete {
-    background-color: #E74C3C; /* Red for delete */
+    background-color: #dc3545;
 }
 
-.admin-action-btntp.delete:hover {
-    background-color: #C0392B;
+.admin-action-btntp:hover:not(:disabled) {
+    background-color: #0056b3;
 }
 
-.admin-action-btntp.primary { /* For the modify button specifically */
-    background-color: #F39C12 !important; /* Accent yellow/orange */
-}
-.admin-action-btntp.primary:hover {
-    background-color: #E67E22 !important;
+.admin-action-btntp.delete:hover:not(:disabled) {
+    background-color: #c82333;
 }
 
-
-.timing-input-group-container {
+.new-timings-container {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    width: 100%;
-}
-
-.timing-input-group-container input {
-    margin-bottom: 0;
+    margin-bottom: 15px;
 }
 
 .timing-input-group {
     display: flex;
     gap: 10px;
     width: 100%;
-    justify-content: flex-end;
 }
 
 .timing-input-group input {
-    flex-grow: 1;
-    max-width: 100px;
-    text-align: center;
+    flex: 1; /* Distribute space evenly */
 }
 
-
-.filter-controls {
+.filters-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 15px;
     margin-bottom: 20px;
+    justify-content: center;
     width: 100%;
-    justify-content: flex-end;
 }
 
-.filter-controls input,
-.filter-controls select,
-.filter-controls button {
-    flex-grow: 1;
-    min-width: 120px;
-    margin-top: 0;
+.filters-container .input-group {
+    margin-bottom: 0; /* Remove extra margin from input groups within filters */
+    flex: 1; /* Allow input groups to grow and shrink */
+    min-width: 180px; /* Minimum width for filter inputs */
 }
 
-/* Pagination controls for work records table */
 .pagination-controls {
     display: flex;
     justify-content: center;
     gap: 15px;
     margin-top: 20px;
-    width: 100%;
 }
 
-.pagination-controls button {
-    width: auto;
-    flex-grow: 1;
-    max-width: 200px;
-    margin-top: 0; /* Override general button margin */
-}
-.pagination-controls button.secondary {
-    background-color: #95A5A6; /* Soft gray for secondary action */
-}
-.pagination-controls button.secondary:hover {
-    background-color: #7F8C8D;
-}
-
-
-.back-btn, #logoutAdminBtn {
-    background-color: #95A5A6; /* Soft gray */
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-    margin-top: 25px;
-    display: block;
-    width: 100%;
+/* Modals General Styling */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1001; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.6); /* Black w/ opacity */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    padding: 20px; /* Add some padding around the modal */
 }
 
-.back-btn:hover, #logoutAdminBtn:hover {
-    background-color: #7F8C8D;
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 30px;
+    border: 1px solid #888;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px; /* Max width for modals */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: right; /* Ensure RTL for modal content */
 }
 
-/* Toast Message Styles */
-.toast-message {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 12px 25px;
-    border-radius: 8px;
-    color: white;
-    font-size: 16px;
-    z-index: 2000;
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out, top 0.5s ease-in-out;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    min-width: 250px;
+body.dark-mode .modal-content {
+    background-color: #34495e;
+    border-color: #5a738c;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    color: #007bff;
     text-align: center;
 }
 
-.toast-message.success {
-    background-color: #2ECC71; /* Secondary green for success */
+body.dark-mode .modal-content h3 {
+    color: #76D7C4;
 }
 
-.toast-message.error {
-    background-color: #E74C3C; /* Red for error */
+.modal-content p {
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.modal-buttons button {
+    align-self: flex-end; /* Override default button alignment */
+}
+
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #333;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+body.dark-mode .close-button {
+    color: #ccc;
+}
+
+body.dark-mode .close-button:hover,
+body.dark-mode .close-button:focus {
+    color: #ecf0f1;
+}
+
+/* Toast Message Styling */
+.toast-message {
+    visibility: hidden; /* Hidden by default */
+    min-width: 250px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 16px;
+    position: fixed;
+    z-index: 1002;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 30px;
+    font-size: 17px;
+    opacity: 0;
+    transition: opacity 0.5s, visibility 0.5s;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .toast-message.show {
+    visibility: visible;
     opacity: 1;
-    top: 30px;
 }
 
-/* Loading Indicator Styles */
+.toast-message.success {
+    background-color: #28a745; /* Green for success */
+}
+
+.toast-message.error {
+    background-color: #dc3545; /* Red for error */
+}
+
+/* Loading Indicator */
 .loading-indicator {
+    display: none; /* Hidden by default */
     position: fixed;
-    top: 0;
     left: 0;
+    top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
-    display: flex;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+    z-index: 2000; /* On top of everything */
     justify-content: center;
     align-items: center;
-    z-index: 3000;
 }
 
 .spinner {
-    border: 8px solid #f3f3f3;
-    border-top: 8px solid #3498DB; /* Primary blue spinner */
+    border: 8px solid #f3f3f3; /* Light grey */
+    border-top: 8px solid #007bff; /* Blue */
     border-radius: 50%;
     width: 60px;
     height: 60px;
-    animation: spin 0.7s linear infinite;
-    transition: border-top-color 0.3s ease;
+    animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
@@ -972,467 +991,206 @@ body.dark-mode .session-details-popup .delay-amount-text {
     100% { transform: rotate(360deg); }
 }
 
-/* Modal Styles */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 4000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.4);
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    background-color: #fefefe; /* Light modal background */
-    margin: auto;
-    padding: 30px;
-    border: 1px solid #888;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    position: relative;
-    text-align: right;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.modal-content h3 {
-    text-align: center;
-    color: #3498DB; /* Primary blue */
-    margin-bottom: 25px;
-}
-
-.modal-content label {
-    display: block;
-    margin-bottom: 8px;
-    margin-top: 15px;
-    font-weight: 600;
-    color: #555;
-    transition: color 0.3s ease;
-}
-
-.modal-content input[type="number"],
-.modal-content input[type="date"],
-.modal-content input[type="time"],
-.modal-content select {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ced4da;
-    border-radius: 5px;
-    font-size: 16px;
-    box-sizing: border-box;
-    display: block;
-    transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
-}
-
-.modal-content button {
-    background-color: #3498DB; /* Primary blue */
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 17px;
-    transition: background-color 0.3s ease;
-    width: 100%;
-    margin-top: 20px;
-}
-
-.modal-content button:hover {
-    background-color: #2980B9; /* Darker primary blue */
-}
-
-/* Modal specific buttons */
-.modal-buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    margin-top: 20px;
-}
-.modal-buttons button {
-    flex-grow: 1;
-    margin-top: 0; /* Override general button margin */
-}
-.modal-buttons button.secondary {
-    background-color: #95A5A6; /* Soft gray */
-}
-.modal-buttons button.secondary:hover {
-    background-color: #7F8C8D;
-}
-
-
-.close-button {
-    color: #aaa;
-    float: left;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-    position: absolute;
-    top: 10px;
-    right: 15px;
-}
-
-.close-button:hover,
-.close-button:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-/* Language Switcher Styles */
+/* Language Switcher */
 .lang-switcher {
-    position: fixed;
+    position: absolute;
     top: 20px;
-    right: 20px;
-    z-index: 100;
+    right: 20px; /* Position to the right for RTL by default */
     display: flex;
     gap: 5px;
+    z-index: 100;
+}
+
+html[dir="ltr"] .lang-switcher {
+    left: 20px; /* Move to left for LTR */
+    right: auto;
 }
 
 .lang-btn {
-    background-color: #ECF0F1; /* Light gray */
-    color: #495057;
-    border: 1px solid #ced4da;
     padding: 8px 12px;
+    font-size: 0.9em;
+    background-color: #e9ecef;
+    color: #333;
+    border: 1px solid #ddd;
     border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    width: auto;
-}
-
-.lang-btn:hover {
-    background-color: #DDEBF0; /* Lighter blue */
-    color: #343a40;
 }
 
 .lang-btn.active {
-    background-color: #3498DB; /* Primary blue */
+    background-color: #007bff;
     color: white;
-    border-color: #3498DB;
     font-weight: bold;
 }
 
-/* Dark Mode Toggle Button */
+.lang-btn:hover {
+    background-color: #d0d5db;
+}
+
+.lang-btn.active:hover {
+    background-color: #0056b3;
+}
+
+/* Dark Mode Toggle */
 .dark-mode-toggle {
-    position: fixed;
+    position: absolute;
     top: 20px;
-    left: 20px;
-    z-index: 5000;
-    background-color: #3498DB; /* Primary blue */
-    color: white;
-    border: none;
+    left: 20px; /* Position to the left for RTL by default */
+    background-color: #e9ecef;
+    color: #333;
+    border: 1px solid #ddd;
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    font-size: 22px;
-    cursor: pointer;
+    width: 40px;
+    height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    z-index: 100;
+}
+
+html[dir="ltr"] .dark-mode-toggle {
+    right: 20px; /* Move to right for LTR */
+    left: auto;
 }
 
 .dark-mode-toggle:hover {
-    background-color: #2980B9; /* Darker primary blue */
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    background-color: #d0d5db;
 }
 
-/* Dark Mode Styles */
-body.dark-mode {
-    background-color: #1A242F; /* Dark background */
-    color: #F8F9FA; /* Brighter general text color for better contrast */
+/* Employee Rates Table Specifics */
+.employee-rates-table-container {
+    width: 100%;
+    overflow-x: auto;
 }
 
-body.dark-mode .page,
-body.dark-mode .modal-content,
-body.dark-mode .popup,
-body.dark-mode .admin-section,
-body.dark-mode .work-summary-section,
-body.dark-mode .task-timing-buttons-section {
-    background-color: #2C3E50; /* Darker blue/gray for elements */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    border-color: #4A6070; /* Darker border */
-    color: #F8F9FA; /* Ensure general text within these containers is light */
+.employee-rates-table-container table {
+    min-width: 900px; /* Ensure enough width for all columns */
 }
 
-body.dark-mode h1,
-body.dark-mode h2,
-body.dark-mode h3 {
-    color: #76D7C4; /* Soft teal for headings */
-    text-shadow: 0 0 5px rgba(118, 215, 196, 0.3);
+.employee-rates-table-container th,
+.employee-rates-table-container td {
+    white-space: nowrap;
 }
 
-body.dark-mode .input-group label,
-body.dark-mode .modal-content label {
-    color: #E0E0E0; /* Slightly brighter for labels */
+.info-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
 }
 
-body.dark-mode input[type="text"],
-body.dark-mode input[type="password"],
-body.dark-mode input[type="number"],
-body.dark-mode input[type="date"],
-body.dark-mode input[type="time"],
-body.dark-mode select {
-    background-color: #34495E; /* Even darker blue/gray for inputs */
-    color: #F8F9FA; /* Ensure input text is bright */
-    border-color: #5D7A90;
+body.dark-mode .info-group {
+    border-bottom: 1px solid #5a738c;
 }
 
-body.dark-mode button:not(.dark-mode-toggle):not(.lang-btn),
-body.dark-mode .task-timing-btn,
-body.dark-mode .big-option-btn,
-body.dark-mode .save-work-btn,
-body.dark-mode .admin-action-btn,
-body.dark-mode .back-btn,
-body.dark-mode #logoutAdminBtn,
-body.dark-mode .pagination-controls button { /* Added for pagination buttons */
-    background-color: #3498DB; /* Primary blue */
-    color: #ECF0F1;
+.info-group span:first-child {
+    font-weight: bold;
+    color: #555;
 }
 
-body.dark-mode button:not(.dark-mode-toggle):not(.lang-btn):hover,
-body.dark-mode .task-timing-btn:hover,
-body.dark-mode .big-option-btn:hover,
-body.dark-mode .save-work-btn:hover,
-body.dark-mode .admin-action-btn:hover,
-body.dark-mode .back-btn:hover,
-body.dark-mode #logoutAdminBtn:hover,
-body.dark-mode .pagination-controls button:hover { /* Added for pagination buttons */
-    background-color: #2980B9;
+body.dark-mode .info-group span:first-child {
+    color: #ecf0f1;
 }
 
-body.dark-mode .task-timing-btn.active {
-    background-color: #5DADE2;
-}
-
-body.dark-mode .undo-btn {
-    background-color: #F39C12; /* Accent yellow */
-    color: #2C3E50;
-}
-
-body.dark-mode .undo-btn:hover {
-    background-color: #E67E22;
-}
-
-body.dark-mode .time-since-last-click {
-    background-color: rgba(52, 152, 219, 0.7); /* Primary blue semi-transparent */
-    color: #ECF0F1;
-}
-
-body.dark-mode .total-hours-box {
-    background-color: #2ECC71; /* Secondary green */
-    border: 1px solid #27AE60;
-}
-
-body.dark-mode .total-hours-box p,
-body.dark-mode .total-hours-box p span {
-    color: #F8F9FA; /* Ensure text inside total boxes is bright */
-}
-
-
-body.dark-mode table {
-    border-color: #4A6070;
-}
-
-body.dark-mode table th {
-    background-color: #34495E; /* Darker blue/gray for table headers */
-    color: #76D7C4 !important; /* Soft teal, ensure it's applied */
-    border-color: #5D7A90;
-}
-
-body.dark-mode table td {
-    background-color: #2C3E50 !important; /* Darker blue/gray for table cells */
-    color: #F8F9FA !important; /* Brighter text color for table cells */
-    border-color: #4A6070 !important;
-}
-
-body.dark-mode .toast-message.success {
-    background-color: #2ECC71;
-}
-
-body.dark-mode .toast-message.error {
-    background-color: #E74C3C;
-}
-
-body.dark-mode .spinner {
-    border-top: 8px solid #76D7C4; /* Soft teal spinner */
-}
-
-body.dark-mode .lang-btn {
-    background-color: #2C3E50 !important;
-    color: #BDC3C7 !important;
-    border-color: #4A6070 !important;
-}
-
-body.dark-mode .lang-btn:hover {
-    background-color: #34495E !important;
-    color: #ECF0F1 !important;
-}
-
-body.dark-mode .lang-btn.active {
-    background-color: #3498DB;
-    border-color: #3498DB;
-}
-
-/* Dark mode for total cells */
-body.dark-mode .track-work-container table .total-cell {
-    background-color: #34495E !important; /* Darker blue/gray */
-    color: #76D7C4 !important; /* Soft teal */
-}
-
-/* Dark mode for grand total footer */
-body.dark-mode #trackTasksTableFoot td.grand-total-footer-cell {
-    background-color: #34495E !important;
-    border-top-color: #76D7C4 !important;
-    color: #76D7C4 !important;
-}
-
-/* Dark mode for daily record row border */
-body.dark-mode .track-work-container table tbody .daily-record-row {
-    border-top: 2px solid #76D7C4; /* Soft teal */
-}
-
-/* New style for the circular edit icon */
 .edit-icon-circle {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
-    background-color: #F39C12; /* Accent yellow/orange */
+    background-color: #007bff;
     color: white;
     cursor: pointer;
-    font-size: 12px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    font-size: 0.9em;
+    transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 .edit-icon-circle:hover {
-    background-color: #E67E22;
+    background-color: #0056b3;
     transform: scale(1.1);
 }
 
 body.dark-mode .edit-icon-circle {
     background-color: #76D7C4; /* Soft teal in dark mode */
-    color: #2C3E50;
+    color: #2c3e50;
 }
 
 body.dark-mode .edit-icon-circle:hover {
-    background-color: #5DADE2;
+    background-color: #4CAF50; /* Darker green on hover */
 }
 
 
-body.dark-mode .admin-action-btntp {
-    background-color: #95A5A6 !important; /* Soft gray */
-    color: #F8F9FA !important; /* Ensure text is light */
-}
-body.dark-mode .admin-action-btntp:hover {
-    background-color: #7F8C8D !important;
-}
-body.dark-mode .admin-action-btntp.delete {
-    background-color: #E74C3C !important;
-}
-body.dark-mode .admin-action-btntp.delete:hover {
-    background-color: #C0392B !important;
-}
-body.dark-mode .admin-action-btntp.primary {
-    background-color: #F39C12 !important;
-}
-body.dark-mode .admin-action-btntp.primary:hover {
-    background-color: #E67E22 !important;
-}
-
-
-/* Responsive adjustments */
+/* Responsive Adjustments */
 @media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
     .page {
+        padding: 20px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .login-container,
+    .task-selection-popup,
+    .modal-content {
         padding: 20px;
         gap: 15px;
     }
 
-    h1, h2, h3 {
-        margin-bottom: 20px;
+    .pin-input-container {
+        /* Adjusted for single row on small screens */
+        flex-wrap: nowrap; /* Prevent wrapping */
+        overflow-x: auto; /* Allow horizontal scroll if needed, though aiming to fit */
+        justify-content: center; /* Center the inputs */
+        gap: 5px; /* Reduce gap on smaller screens */
     }
 
-    .header-bar {
+    .pin-input-container input[type="password"] {
+        width: 30px; /* Slightly smaller width for each PIN digit */
+        height: 30px;
+        font-size: 16px;
+    }
+
+    .dashboard-summary {
         flex-direction: column;
-        text-align: center;
         gap: 15px;
     }
 
-    .user-info {
-        flex-direction: column;
-        margin-bottom: 15px;
-        gap: 10px;
+    .summary-box {
+        max-width: 100%;
     }
-    .user-info p {
-        font-size: 18px;
-    }
-    .total-hours-box {
-        width: 100%;
-        min-width: unset;
-        align-items: center;
-    }
-
 
     .dashboard-options {
-        flex-direction: column;
-        gap: 20px;
+        gap: 10px;
     }
 
     .big-option-btn {
-        width: 100%;
-        min-width: unset;
-        max-width: unset;
-        padding: 15px 20px;
-        font-size: 20px;
+        padding: 12px 20px;
+        font-size: 1.1em;
     }
 
-    .popup {
-        padding: 20px;
-        gap: 10px;
+    .work-summary p {
+        flex-basis: 100%; /* Stack on small screens */
+        text-align: center;
     }
-    .popup button {
-        width: 100%;
-        margin: 5px 0;
-    }
-
 
     .task-timing-buttons-section {
         gap: 10px;
     }
-    .timing-button-wrapper {
-        flex-basis: calc(50% - 10px); /* Two columns on small screens */
-        min-width: unset;
-        max-width: 180px;
+
+    .task-timing-btn {
+        padding: 12px 20px;
+        font-size: 1em;
+        min-width: 100px;
     }
 
-
-    .tracking-content {
+    .start-work-actions {
         flex-direction: column;
-    }
-
-    .task-stats-table,
-    .pie-chart-container {
-        min-width: unset;
-        width: 100%;
-    }
-
-    .admin-section {
-        padding: 15px;
         gap: 10px;
     }
 
@@ -1446,7 +1204,7 @@ body.dark-mode .admin-action-btntp.primary:hover {
         margin-bottom: 10px;
         justify-content: center;
         width: 100%;
-        order: -1;
+        order: -1; /* Move to top in flex container */
     }
 
     .lang-btn {
@@ -1460,10 +1218,7 @@ body.dark-mode .admin-action-btntp.primary:hover {
         height: 40px;
         font-size: 18px;
     }
-    .modal-content {
-        padding: 20px;
-        gap: 10px;
-    }
+    
     /* Ensure tables scroll horizontally on small screens */
     .table-responsive {
         overflow-x: auto;
@@ -1478,12 +1233,53 @@ body.dark-mode .admin-action-btntp.primary:hover {
     .track-work-container table td,
     .admin-section table th,
     .admin-section table td {
-        font-size: 11px; /* Even smaller font for mobile tables */
-        padding: 4px 6px; /* Reduced padding */
+        font-size: 0.85em;
+        padding: 8px 5px;
     }
-    /* Adjust font size for action buttons in tables */
-    .admin-action-btn, .admin-action-btntp {
-        font-size: 9px !important; /* Very small for mobile buttons */
-        padding: 3px 6px !important;
+
+    .filters-container {
+        flex-direction: column;
+        gap: 10px;
     }
+
+    .filters-container .input-group {
+        min-width: unset; /* Remove min-width to allow full width */
+        width: 100%;
+    }
+}
+
+/* Ensure consistent text alignment for RTL in various elements */
+h2, h3, h4 {
+    text-align: center;
+}
+
+/* Ensure text direction is correct for inputs that might contain numbers/English text */
+input[type="text"],
+input[type="number"],
+input[type="password"],
+input[type="date"],
+input[type="time"],
+select,
+textarea {
+    direction: ltr; /* Force LTR for input values */
+    text-align: right; /* Align text to the right within the LTR input */
+}
+
+/* Override for specific elements if needed to be RTL */
+.input-group label,
+.modal-content p,
+.detailed-summary-container p,
+.session-details-popup p {
+    text-align: right;
+}
+
+/* For the language buttons, ensure text is centered */
+.lang-btn {
+    text-align: center;
+}
+
+/* For the PIN inputs, ensure numbers are LTR but centered */
+.pin-input-container input[type="password"] {
+    direction: ltr;
+    text-align: center;
 }
