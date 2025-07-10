@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, doc, collection, getDocs, setDoc, updateDoc, deleteDoc, query, where, limit, Timestamp, serverTimestamp, addDoc, orderBy, onSnapshot, startAfter } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getFirestore, doc, collection, getDocs, setDoc, updateDoc, deleteDoc, query, where, limit, Timestamp, serverTimestamp, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { documentId } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; // Import documentId
 
 // Your web app's Firebase configuration
@@ -114,8 +114,7 @@ const accountsTableBody = document.getElementById('accountsTableBody');
 
 // Manage Tasks
 const newTaskNameInput = document.getElementById('newTaskNameInput');
-// Corrected typo here: removed "document ="
-const newTaskNameInputError = document.getElementById('newTaskNameInputError');
+const newTaskNameInputError = document.getElementById('newTaskNameInputError'); // Corrected typo
 const newTimingsContainer = document.getElementById('newTimingsContainer');
 const newTimingsInputError = document.getElementById('newTimingsInputError');
 const addTimingFieldBtn = document.getElementById('addTimingFieldBtn');
@@ -2401,8 +2400,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     pinInputs.forEach((input, index) => {
         input.addEventListener('input', () => {
             clearInputError(input, pinInputError);
-            if (input.value.length === 1 && index < pinInputs.length - 1) {
-                pinInputs[index + 1].focus();
+            if (input.value.length === 1) {
+                if (index < pinInputs.length - 1) {
+                    pinInputs[index + 1].focus();
+                } else {
+                    // This is the last input, trigger login automatically
+                    login();
+                }
             }
         });
         input.addEventListener('keydown', (e) => {
@@ -2414,7 +2418,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 if (loginBtn) loginBtn.addEventListener('click', login);
-// Listen for Enter key on the last PIN input field
+// Keep the Enter key listener as a fallback, though automatic login should handle most cases
 if (pinInputs[pinInputs.length - 1]) {
     pinInputs[pinInputs.length - 1].addEventListener('keypress', (e) => {
         if (e.key === 'Enter') login();
