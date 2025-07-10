@@ -54,9 +54,24 @@
             <div class="user-info">
                 <img src="https://github.com/Alexu12345/Work_Tracker/blob/main/images.jpg?raw=true" alt="User Avatar" class="user-avatar">
                 <p><span data-key="hello">مرحباً، </span><span id="userNameDisplay"></span>!</p>
-                <div class="total-hours-box">
+                <div id="totalHoursBox" class="total-hours-box"> <!-- Added ID here for event listener -->
                     <p><span data-key="totalHoursTitle">إجمالي ساعات العمل:</span> <span id="totalHoursDisplay">0.00</span> <span data-key="hoursUnit">ساعة</span></p>
                     <p><span data-key="totalBalanceTitle">إجمالي الرصيد:</span> <span id="totalBalanceDisplay">0.00</span> <span data-key="currencyUnit">جنيه</span></p>
+                </div>
+            </div>
+            <!-- Session Details Popup - New Element -->
+            <div id="sessionDetailsPopup" class="session-details-popup" style="display: none;">
+                <div class="basic-info-section">
+                    <p><span data-key="sessionStartTimeLabel">وقت بداية الجلسة:</span> <span id="popupSessionStartTime"></span></p>
+                    <p><span data-key="totalSessionTimeLabel">إجمالي وقت الجلسة:</span> <span id="popupTotalSessionTime"></span></p>
+                    <p><span data-key="netSessionTimeLabel">صافي وقت الجلسة:</span> <span id="popupNetSessionTime"></span></p>
+                    <p><span data-key="delayAmountLabel">التأخير:</span> <span id="popupDelayAmount" class="delay-amount-text"></span></p>
+                </div>
+                <div class="variable-info-section">
+                    <h4 data-key="taskDetailsByTiming">تفاصيل المهام حسب التوقيت:</h4>
+                    <div id="popupVariableInfoContainer">
+                        <!-- Variable info will be rendered here -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -98,18 +113,6 @@
                 </table>
                 <div id="detailedSummaryContainer">
                     <!-- Detailed timing summary will be rendered here -->
-                </div>
-
-                <!-- Session Time Popup -->
-                <div id="sessionTimePopup" class="session-time-popup">
-                    <h4 data-key="sessionDetailsTitle">تفاصيل الجلسة</h4>
-                    <p><span data-key="sessionStartTimeLabel">وقت بداية الجلسة:</span> <span id="sessionStartTime"></span></p>
-                    <p><span data-key="totalSessionTimeDisplayLabel">إجمالي وقت الجلسة:</span> <span id="popupTotalSessionTime"></span></p>
-                    <p><span data-key="netSessionTimeLabel">صافي وقت الجلسة:</span> <span id="netSessionTime"></span></p>
-                    <p><span data-key="delayLabel">التأخير:</span> <span id="delayDuration"></span></p>
-                    <div id="dynamicTaskDetails">
-                        <!-- Dynamic task details will be rendered here -->
-                    </div>
                 </div>
             </div>
 
