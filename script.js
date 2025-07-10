@@ -1196,71 +1196,49 @@ const renderMainDashboard = async () => {
 // Function to update and display session details in the popup
 const updateSessionDetailsPopup = (userData) => {
     const now = Date.now();
-    let sessionStartTime = 'N/A';
+    let sessionStartTimeDisplay = 'N/A'; // Renamed to avoid confusion with actual timestamp
     let totalSessionMinutes = 0;
-    let netSessionMinutes = 0;
+    let netSessionMinutes = 0; // This will be calculated from currentSessionTasks
     let totalDelayMinutes = 0;
     const variableInfo = {}; // To store tasks by timing
 
     if (userData.sessionStartTime) {
         const sessionStartMs = userData.sessionStartTime.toDate().getTime();
-        sessionStartTime = new Date(sessionStartMs).toLocaleTimeString(currentLanguage, { hour: '2-digit', minute: '2-digit' });
+        sessionStartTimeDisplay = new Date(sessionStartMs).toLocaleTimeString(currentLanguage, { hour: '2-digit', minute: '2-digit' });
         
         const currentSessionDurationMs = now - sessionStartMs;
         totalSessionMinutes = currentSessionDurationMs / (60 * 1000); // in minutes
+    }
 
-        if (userData.lastRecordedTaskTimestamp) {
-            const lastRecordedTimeMs = userData.lastRecordedTaskTimestamp.toDate().getTime();
-            const timeSinceLastRecordMs = now - lastRecordedTimeMs;
-            
-            if (userData.currentTaskDefinitionId) {
-                const maxTimingMinutes = getMaxTimingForTask(userData.currentTaskDefinitionId);
-                // Grace period: max task timing + 1 minute (converted to milliseconds)
-                const delayThresholdMs = (maxTimingMinutes * 60 * 1000) + (1 * 60 * 1000); 
+    // Calculate netSessionMinutes from currentSessionTasks based on user's request
+    netSessionMinutes = currentSessionTasks.reduce((sum, task) => sum + task.timing, 0);
 
-                if (timeSinceLastRecordMs > delayThresholdMs) {
-                    totalDelayMinutes = (timeSinceLastRecordMs - delayThresholdMs) / (60 * 1000); // in minutes
-                }
-            }
-        }
-        netSessionMinutes = totalSessionMinutes - totalDelayMinutes;
+    // Calculate totalDelayMinutes based on the new definition (difference between total and net)
+    totalDelayMinutes = totalSessionMinutes - netSessionMinutes;
+    // Ensure delay is not negative (can happen if sessionStartTime is very recent or tasks added quickly)
+    if (totalDelayMinutes < 0) {
+        totalDelayMinutes = 0;
     }
 
     // Populate basic info
-    popupSessionStartTime.textContent = sessionStartTime;
+    popupSessionStartTime.textContent = sessionStartTimeDisplay; // Use the renamed variable
     popupTotalSessionTime.textContent = formatNumberToEnglish(formatMinutesToMMSS(totalSessionMinutes));
     popupNetSessionTime.textContent = formatNumberToEnglish(formatMinutesToMMSS(netSessionMinutes));
     popupDelayAmount.textContent = formatNumberToEnglish(formatMinutesToMMSS(totalDelayMinutes));
     popupDelayAmount.title = formatTotalMinutesToHHMMSS(totalDelayMinutes); // Tooltip for delay in HH:MM:SS
 
-    // Populate variable info (tasks by timing) - This data is not directly available from user activity status
-    // It would require fetching currentSessionTasks if they were persisted, or re-calculating from work records.
-    // For now, we'll display a placeholder or derive from currentSessionTasks if available.
-    // Assuming currentSessionTasks holds the tasks for the *current* active session.
-    if (currentSessionTasks.length > 0) {
+    // Populate variable info (tasks by timing)
+    popupVariableInfoContainer.innerHTML = '';
+    if (currentSessionTasks.length > 0) { // Only show detailed summary if there are current session tasks
         currentSessionTasks.forEach(task => {
-            const timingKey = Math.round(task.timing * 1000).toString(); // Use total seconds as key
+            const timingKey = Math.round(task.timing * 1000).toString(); // Use total seconds as key for precision
             if (!variableInfo[timingKey]) {
                 variableInfo[timingKey] = { count: 0, totalTime: 0 };
             }
             variableInfo[timingKey].count++;
             variableInfo[timingKey].totalTime += task.timing;
         });
-    } else if (userData.currentAccountId && userData.currentTaskDefinitionId) {
-        // If no currentSessionTasks (e.g., after page reload), we can try to infer from user's last recorded task.
-        // This is a simplification; a true "session tasks" would need to be persisted.
-        // For now, we'll just show the current task definition's timings if available.
-        const taskDef = allTaskDefinitions.find(t => t.id === userData.currentTaskDefinitionId);
-        if (taskDef && taskDef.timings && taskDef.timings.length > 0) {
-            taskDef.timings.forEach(timing => {
-                const timingKey = Math.round(timing * 1000).toString();
-                variableInfo[timingKey] = { count: '?', totalTime: timing }; // Cannot know count without saved session tasks
-            });
-        }
-    }
 
-    popupVariableInfoContainer.innerHTML = '';
-    if (Object.keys(variableInfo).length > 0) {
         const sortedTimings = Object.keys(variableInfo).sort((a, b) => parseFloat(a) - parseFloat(b));
         sortedTimings.forEach(timingKey => {
             const summary = variableInfo[timingKey];
@@ -1322,6 +1300,8 @@ const fetchAccountsAndTasks = async () => {
         });
     } catch (error) {
         showToastMessage(getTranslatedText('errorLoadingData'), 'error');
+    } finally {
+        showLoadingIndicator(false);
     }
 };
 
@@ -2105,9 +2085,10 @@ const loadAndDisplayUsers = async () => {
                         const currentSessionDurationMs = now - sessionStartMs;
                         const totalSessionMinutes = currentSessionDurationMs / (60 * 1000); // in minutes
 
-                        let netSessionMinutes = totalSessionMinutes;
+                        let netSessionMinutesForStatus = totalSessionMinutes; // Placeholder for status display
                         let delayMinutes = 0;
 
+                        // This part is for detailed tooltip, not for main netSessionMinutes calculation
                         if (user.lastRecordedTaskTimestamp) {
                             const lastRecordedTimeMs = user.lastRecordedTaskTimestamp.toDate().getTime();
                             const timeSinceLastRecordMs = now - lastRecordedTimeMs;
@@ -2118,7 +2099,8 @@ const loadAndDisplayUsers = async () => {
                                 delayMinutes = (timeSinceLastRecordMs - delayThresholdMs) / (60 * 1000);
                             }
                         }
-                        netSessionMinutes = totalSessionMinutes - delayMinutes;
+                        netSessionMinutesForStatus = totalSessionMinutes - delayMinutes;
+
 
                         statusText = getTranslatedText('onlineOnAccountTask', {
                             account: user.currentAccountName,
@@ -2127,7 +2109,7 @@ const loadAndDisplayUsers = async () => {
                         statusColor = '#3498DB'; // Blue for working on a task
                         statusTooltip = `${getTranslatedText('sessionStartTimeLabel')} ${new Date(sessionStartMs).toLocaleTimeString(currentLanguage, { hour: '2-digit', minute: '2-digit' })}\n`;
                         statusTooltip += `${getTranslatedText('totalSessionTimeLabel')} ${formatTotalMinutesToHHMMSS(totalSessionMinutes)}\n`;
-                        statusTooltip += `${getTranslatedText('netSessionTimeLabel')} ${formatTotalMinutesToHHMMSS(netSessionMinutes)}\n`;
+                        statusTooltip += `${getTranslatedText('netSessionTimeLabel')} ${formatTotalMinutesToHHMMSS(netSessionMinutesForStatus)}\n`; // Use netSessionMinutesForStatus
                         statusTooltip += `${getTranslatedText('delayAmountLabel')} ${formatTotalMinutesToHHMMSS(delayMinutes)}`;
 
                     } else if (diffMs < USER_ONLINE_THRESHOLD_MS) { // Less than 1 minute (actively online, but not working on task)
