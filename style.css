@@ -7,7 +7,14 @@ td, th {
     text-align: center !important;
     white-space: normal !important;
 }
-
+.dashboard-page{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.summary-boxes {
+    display: block ruby;
+}
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f0f2f5; /* Light mode background */
