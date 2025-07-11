@@ -645,7 +645,7 @@ table {
 }
 
 table th, table td {
-    padding: 12px 8px;
+    padding: 1px 1px;
     border: 1px solid #ddd;
     text-align: center;
     white-space: nowrap; /* Prevent text wrapping in cells */
