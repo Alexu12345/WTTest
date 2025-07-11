@@ -152,12 +152,12 @@ body.dark-mode .modal-buttons button.secondary:hover {
 /* Page Containers - General styling */
 .page {
     background-color: #ffffff; /* Light mode page background */
-    padding: 35px;
+    padding: 15px;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 900px; /* Max width for larger screens */
-    margin-top: 20px; /* Space from top for header elements */
+    max-width: 95%; /* Max width for larger screens */
+    margin-top: 50px; /* Space from top for header elements */
     margin-bottom: 20px; /* Space from bottom */
     display: flex;
     flex-direction: column;
